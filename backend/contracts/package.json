@@ -1,0 +1,28 @@
+{
+  "name": "poisonguard-proof-registry",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:offline": "HARDHAT_LOCAL_SOLC=1 hardhat test",
+    "abi": "hardhat compile && node scripts/export-abi.js",
+    "node": "hardhat node",
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
+    "deploy:sepolia": "hardhat run scripts/deploy.js --network sepolia",
+    "admin": "hardhat run scripts/admin.js",
+    "verify-anchor": "hardhat run scripts/verify-anchor.js"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.1.3",
+    "chai": "^4.5.0",
+    "ethers": "^6.17.0",
+    "hardhat": "^2.22.17",
+    "solc": "^0.8.24"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.1.0"
+  },
+  "version": "2.0.0",
+  "description": "PoisonGuard ProofRegistry v2 — append-only on-chain commitments for audit/proof anchoring"
+}
