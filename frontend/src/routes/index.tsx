@@ -39,9 +39,9 @@ import { OrbScene } from "@/components/pg/orb-scene";
 /** Left-aligned hero copy + free-floating orb on the right (two-column balanced hero). */
 export function HeroIntro() {
   return (
-    <div className="relative mx-auto flex max-w-7xl items-center gap-0 lg:gap-6 xl:gap-10">
-      {/* ── Left text column: ~58% ── */}
-      <div className="relative z-20 flex w-full shrink-0 flex-col text-left lg:w-[58%] xl:w-[57%]">
+    <div className="relative mx-auto flex max-w-7xl items-center gap-0 lg:gap-4 xl:gap-6">
+      {/* ── Left text column: ~55% ── */}
+      <div className="relative z-20 flex w-full shrink-0 flex-col text-left lg:w-[55%] xl:w-[54%]">
         {/* Heading */}
         <h1 className="text-[2.6rem] font-light leading-[1.1] tracking-tight text-foreground sm:text-5xl sm:leading-[1.1] lg:text-[3.4rem] lg:leading-[1.08] xl:text-6xl xl:leading-[1.07]">
           <span className="pg-word-in inline-block" style={{ animationDelay: "100ms" }}>
@@ -85,31 +85,26 @@ export function HeroIntro() {
           </Button>
         </div>
 
-        {/* Live Protection status card — bottom of left column */}
+        {/* Live Protection — clean inline pill row, no boxy card */}
         <div
-          className="pg-word-in mt-8 sm:mt-10"
+          className="pg-word-in mt-6 flex items-center gap-2.5 text-xs text-muted-foreground"
           style={{ animationDelay: "560ms" }}
         >
-          <div className="inline-flex items-start gap-3 rounded-2xl border border-border/60 bg-card/80 px-4 py-3 shadow-sm backdrop-blur-sm">
-            {/* Pulse indicator */}
-            <span className="relative mt-0.5 flex size-2 shrink-0">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
-              <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
-            </span>
-            <div>
-              <p className="text-xs font-semibold text-foreground">Live Protection Active</p>
-              <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
-                Real-time lookalike &amp; zero-value dust detection across 7 EVM networks
-              </p>
-            </div>
-          </div>
+          {/* Animated pulse dot */}
+          <span className="relative flex size-2 shrink-0">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
+            <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
+          </span>
+          <span className="font-medium text-foreground">Live Protection Active</span>
+          <span className="text-border">·</span>
+          <span>Real-time lookalike &amp; zero-value dust detection across 7 EVM networks</span>
         </div>
       </div>
 
-      {/* ── Right column: 3D orb ~42% ── */}
-      <div className="relative z-10 hidden w-full items-center justify-center lg:flex lg:w-[42%] xl:w-[43%]">
-        {/* Fixed-size orb container — sized to be clearly visible and balanced */}
-        <div className="relative aspect-square w-full max-w-[460px] xl:max-w-[510px]">
+      {/* ── Right column: 3D orb, ~45% wide, tall enough to be impactful ── */}
+      <div className="relative z-10 hidden shrink-0 items-center justify-center lg:flex lg:w-[45%] xl:w-[46%]">
+        {/* Square container — 100% of column width, capped at 580px so it's prominent */}
+        <div className="relative h-[480px] w-full max-w-[540px] xl:h-[560px] xl:max-w-[600px]">
           <OrbScene />
         </div>
       </div>
