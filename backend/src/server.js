@@ -10,6 +10,14 @@ await runMigrations((m) => app.log.info(m))
 await seedReference()
 await app.listen({ port: env.PORT, host: env.HOST })
 
+// Process safety handlers
+process.on('unhandledRejection', (reason) => {
+  app.log.warn({ reason: reason?.message || reason }, 'Unhandled Promise Rejection')
+})
+process.on('uncaughtException', (err) => {
+  app.log.error({ err: err?.message || err }, 'Uncaught Exception')
+})
+
 // Inline mode runs periodic jobs in-process; queue mode leaves them to the worker.
 const timers = []
 if (env.JOB_MODE === 'inline') {
