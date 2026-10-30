@@ -39,51 +39,40 @@ import { OrbScene } from "@/components/pg/orb-scene";
 /** Left-aligned hero copy + free-floating orb on the right (two-column balanced hero). */
 export function HeroIntro() {
   return (
-    <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 lg:grid-cols-12 lg:gap-8 xl:gap-12">
-      {/* Left text column: 7 columns on desktop */}
-      <div className="relative z-20 text-left sm:pl-2 lg:col-span-7 lg:pl-4 xl:pl-6">
-        {/* Category badge above heading */}
-        <div
-          className="pg-word-in mb-3 sm:mb-4 inline-flex items-center gap-2 rounded-full border border-primary/10 bg-primary/5 px-3.5 py-1 text-xs font-medium text-foreground backdrop-blur-sm"
-          style={{ animationDelay: "80ms" }}
-        >
-          <span className="relative flex size-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
-          </span>
-          <span>EVM Attack Defense · Graph Risk Intelligence</span>
-        </div>
-
+    <div className="relative mx-auto flex max-w-7xl items-center gap-0 lg:gap-6 xl:gap-10">
+      {/* ── Left text column: ~58% ── */}
+      <div className="relative z-20 flex w-full shrink-0 flex-col text-left lg:w-[58%] xl:w-[57%]">
         {/* Heading */}
-        <h1 className="text-4xl font-light tracking-tight text-foreground sm:text-5xl sm:leading-[1.12] lg:text-6xl">
-          <span className="pg-word-in inline-block" style={{ animationDelay: "160ms" }}>
+        <h1 className="text-[2.6rem] font-light leading-[1.1] tracking-tight text-foreground sm:text-5xl sm:leading-[1.1] lg:text-[3.4rem] lg:leading-[1.08] xl:text-6xl xl:leading-[1.07]">
+          <span className="pg-word-in inline-block" style={{ animationDelay: "100ms" }}>
             Verify before you sign.
           </span>
           <br />
-          <span className="relative inline-block mt-0.5 sm:mt-1">
-            <span className="pg-word-in text-grad inline-block font-normal" style={{ animationDelay: "280ms" }}>
+          <span className="relative inline-block mt-1">
+            <span className="pg-word-in text-grad inline-block font-normal" style={{ animationDelay: "230ms" }}>
               Never blindly execute.
             </span>
             <span
               className="pg-bar-in absolute -bottom-1.5 left-0 right-0 h-[2.5px] rounded-full bg-gradient-to-r from-primary/50 via-primary/80 to-transparent"
-              style={{ animationDelay: "450ms" }}
+              style={{ animationDelay: "430ms" }}
             />
           </span>
         </h1>
 
-        {/* Description: comfortably connected to heading */}
+        {/* Description */}
         <p
-          className="pg-word-in mt-4 max-w-xl text-base text-muted-foreground sm:text-lg leading-relaxed"
-          style={{ animationDelay: "380ms" }}
+          className="pg-word-in mt-5 max-w-[42ch] text-base leading-[1.7] text-muted-foreground sm:text-[1.0625rem]"
+          style={{ animationDelay: "340ms" }}
         >
-          PoisonGuard protects individuals and teams against lookalike addresses, zero-value transfer dust attacks,
-          and rogue smart contract approvals — with built-in governance for autonomous AI agents.
+          PoisonGuard protects individuals and teams against lookalike addresses, zero-value
+          transfer dust attacks, and rogue smart contract approvals — with built-in governance
+          for autonomous AI agents.
         </p>
 
         {/* CTA group */}
         <div
-          className="pg-word-in mt-6 flex flex-wrap items-center gap-3"
-          style={{ animationDelay: "480ms" }}
+          className="pg-word-in mt-7 flex flex-wrap items-center gap-3"
+          style={{ animationDelay: "450ms" }}
         >
           <Button asChild size="lg" className="rounded-full px-6 shadow-sm">
             <a href="#scanner">Launch Scanner <ArrowRight className="ml-1.5 size-4" /></a>
@@ -96,23 +85,38 @@ export function HeroIntro() {
           </Button>
         </div>
 
-        {/* Live Protection info box appropriately below CTA group */}
+        {/* Live Protection status card — bottom of left column */}
         <div
-          className="pg-word-in mt-5 sm:mt-6 flex flex-wrap items-center gap-3 text-xs text-muted-foreground"
+          className="pg-word-in mt-8 sm:mt-10"
           style={{ animationDelay: "560ms" }}
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/75 px-3.5 py-1.5 backdrop-blur-sm shadow-xs">
-            <ShieldCheck className="size-3.5 text-emerald-600 shrink-0" />
-            <span className="font-medium text-foreground">Live Protection Active</span>
-            <span>·</span>
-            <span>Real-time lookalike & zero-value dust detection across 7 EVM networks</span>
+          <div className="inline-flex items-start gap-3 rounded-2xl border border-border/60 bg-card/80 px-4 py-3 shadow-sm backdrop-blur-sm">
+            {/* Pulse indicator */}
+            <span className="relative mt-0.5 flex size-2 shrink-0">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
+              <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
+            </span>
+            <div>
+              <p className="text-xs font-semibold text-foreground">Live Protection Active</p>
+              <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
+                Real-time lookalike &amp; zero-value dust detection across 7 EVM networks
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 3D Orb Scene: right column (5 cols on desktop, shifted ~28-36px right on desktop) */}
-      <div className="relative z-10 flex w-full items-center justify-center lg:col-span-5 lg:justify-end">
-        <div className="relative h-[340px] w-[340px] sm:h-[420px] sm:w-[420px] lg:h-[480px] lg:w-[480px] xl:h-[530px] xl:w-[530px] lg:translate-x-7 xl:translate-x-9">
+      {/* ── Right column: 3D orb ~42% ── */}
+      <div className="relative z-10 hidden w-full items-center justify-center lg:flex lg:w-[42%] xl:w-[43%]">
+        {/* Fixed-size orb container — sized to be clearly visible and balanced */}
+        <div className="relative aspect-square w-full max-w-[460px] xl:max-w-[510px]">
+          <OrbScene />
+        </div>
+      </div>
+
+      {/* Mobile-only orb: stacked below text, centered */}
+      <div className="relative z-10 mt-8 flex w-full items-center justify-center lg:hidden">
+        <div className="h-[300px] w-[300px] sm:h-[380px] sm:w-[380px]">
           <OrbScene />
         </div>
       </div>
@@ -170,7 +174,7 @@ function Index() {
   return (
     <PublicLayout>
       {/* Hero Section */}
-      <section className="relative overflow-hidden px-4 pt-4 pb-12 sm:px-6 sm:pt-6 sm:pb-16 lg:px-8 lg:pt-8 lg:pb-20">
+      <section className="relative overflow-x-hidden px-4 pb-12 pt-8 sm:px-6 sm:pb-16 sm:pt-10 lg:px-8 lg:pb-20 lg:pt-12">
         <HeroIntro />
 
         {/* Live Interactive Scanner Card */}
