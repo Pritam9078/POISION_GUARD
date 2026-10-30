@@ -112,3 +112,4 @@ describe('State Machine: Spend Intent FSM Transitions & Guardrails', () => {
     assert.throws(() => verifyBeforeSign(tamperedIntent, originalHash), /INTEGRITY_VIOLATION/)
   })
 })
+

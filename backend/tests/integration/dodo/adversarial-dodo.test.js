@@ -77,3 +77,4 @@ describe('Dodo Payments: Webhook Adversarial & Idempotency Suite', () => {
     assert.equal(subscriptionState.plan, 'business', 'Current plan must not be downgraded by delayed stale event')
   })
 })
+

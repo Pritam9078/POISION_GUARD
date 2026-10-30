@@ -134,3 +134,4 @@ describe('Smart Contract: ProofRegistry Security & Access Control Suite', () => 
     )
   })
 })
+

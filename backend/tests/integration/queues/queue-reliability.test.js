@@ -112,3 +112,4 @@ describe('Queues: Worker Resilience & Distributed Job Processing Suite', () => {
     assert.equal(job.attemptsMade, 2)
   })
 })
+
