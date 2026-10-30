@@ -9,7 +9,13 @@ import { assertCan } from '../shared/permissions.js'
 export const USER_COOKIE = 'pg_sid'
 export const STAFF_COOKIE = 'pg_staff_sid'
 
-export const allowedOrigins = () => (env.CORS_ORIGINS ? env.CORS_ORIGINS.split(',').map((s) => s.trim()) : [env.FRONTEND_URL, env.ADMIN_URL])
+export const allowedOrigins = () => {
+  if (env.CORS_ORIGINS) {
+    if (env.CORS_ORIGINS === '*') return ['*']
+    return env.CORS_ORIGINS.split(',').map((s) => s.trim().replace(/\/+$/, ''))
+  }
+  return [env.FRONTEND_URL, env.ADMIN_URL, 'https://poisionguardadmin.vercel.app', 'https://poisonguard-steel.vercel.app'].map((s) => s.replace(/\/+$/, ''))
+}
 
 export const cookieOpts = (maxAgeSec) => ({ path: '/', httpOnly: true, sameSite: 'lax', secure: env.COOKIE_SECURE, maxAge: maxAgeSec })
 
@@ -24,8 +30,9 @@ async function core(app) {
 
     // CSRF defence for cookie auth: browsers always send Origin on cross-site state-changing requests.
     if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
-      const origin = req.headers.origin
-      if (origin && !allowedOrigins().includes(origin) && !req.url.startsWith('/api/v1/webhooks/') && !req.url.startsWith('/api/v1/agent/')) {
+      const origin = req.headers.origin?.replace(/\/+$/, '')
+      const allowed = allowedOrigins()
+      if (origin && !allowed.includes('*') && !allowed.includes(origin) && !req.url.startsWith('/api/v1/webhooks/') && !req.url.startsWith('/api/v1/agent/')) {
         throw new AppError(403, 'ORIGIN_REJECTED', 'Request origin is not allowed')
       }
     }
