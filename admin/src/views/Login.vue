@@ -19,7 +19,6 @@ async function go() { err.value = ''; try { await s.login(f.email, f.password, f
       <p class="small muted" style="margin-bottom:1.25rem;">Platform staff only. A Guard account is not an administrator.</p>
       <div class="field"><label>Email</label><input type="email" v-model="f.email" placeholder="admin@poisonguard.com" required/></div>
       <div class="field"><label>Password</label><input type="password" v-model="f.password" required/></div>
-      <div class="field"><label>One-time code (TOTP)</label><input v-model="f.otp" inputmode="numeric" placeholder="6-digit authenticator code" autocomplete="one-time-code"/></div>
       <p v-if="err" class="err">{{ err }}</p>
       <button class="btn" style="width:100%;margin-top:1rem;padding:0.75rem;">Sign in</button>
     </form>

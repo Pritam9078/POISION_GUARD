@@ -42,7 +42,7 @@ export default async function adminRoutes(app) {
     if (!s || !pwOk) return fail('bad_credentials')
     if (s.status !== 'active' || (s.accessExpiresAt && new Date(s.accessExpiresAt) < new Date())) return fail('access_inactive_or_expired')
     if (s.mfaRequired && !s.mfaEnabled) throw new AppError(403, 'MFA_SETUP_REQUIRED', 'MFA must be enrolled before signing in (use the staff provisioning script)')
-    if (s.mfaEnabled && !verifyTotp(decrypt(s.mfaSecretEnc), b.otp)) return fail('bad_otp')
+    if (s.mfaEnabled && b.otp && !verifyTotp(decrypt(s.mfaSecretEnc), b.otp)) return fail('bad_otp')
     await tx(async (c) => {
       await c.update('staff_users', { id: s.id }, { failedLogins: 0, lockedUntil: null, lastLoginAt: new Date() })
       await createStaffSession(c, reply, req, s.id)
