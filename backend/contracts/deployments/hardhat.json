@@ -1,0 +1,23 @@
+{
+  "network": "hardhat",
+  "chainId": 11155111,
+  "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  "deployTx": "0x446679937bd277254e5c8500ea9f1e54c59f8b36c49b72f7d7beeff5d6ccb9ea",
+  "blockNumber": 1,
+  "version": "2.0.0",
+  "roles": {
+    "admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "anchorer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "pauser": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "revoker": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+  },
+  "adminDelaySeconds": 0,
+  "constructorArgs": [
+    0,
+    "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+  ],
+  "deployedAt": "2026-10-30T06:33:15.658Z"
+}

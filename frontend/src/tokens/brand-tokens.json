@@ -1,0 +1,38 @@
+{
+  "color": {
+    "ink": "#0F1115",
+    "white": "#FFFFFF",
+    "mist": "#F7F8FC",
+    "cloud": "#F1F2F5",
+    "slate": "#6B7080",
+    "sky": "#CFE0FB",
+    "periwinkle": "#8DA6F4",
+    "violet": "#A99AF6",
+    "lilac": "#F0DDF8"
+  },
+  "risk": {
+    "critical": "#B42318",
+    "high": "#C4540A",
+    "medium": "#B7791F",
+    "low": "#3B5BDB",
+    "verified": "#1E7F52"
+  },
+  "gradient": [
+    "#CFE0FB",
+    "#8DA6F4",
+    "#A99AF6"
+  ],
+  "font": {
+    "display": "Inter Tight",
+    "weights": {
+      "light": 300,
+      "regular": 400,
+      "medium": 500
+    }
+  },
+  "radius": {
+    "card": 24,
+    "float": 40,
+    "pill": 999
+  }
+}

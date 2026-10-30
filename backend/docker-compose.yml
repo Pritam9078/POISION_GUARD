@@ -1,0 +1,30 @@
+# Local stack: Postgres (with pgvector), Redis, API and queue worker.
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment: { POSTGRES_PASSWORD: postgres, POSTGRES_DB: poisonguard }
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U postgres"], interval: 5s, retries: 10 }
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+  api:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/poisonguard
+      REDIS_URL: redis://redis:6379
+      JOB_MODE: queue
+    ports: ["4000:4000"]
+    depends_on: { db: { condition: service_healthy }, redis: { condition: service_started } }
+  worker:
+    build: .
+    command: ["node", "src/workers/index.js"]
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/poisonguard
+      REDIS_URL: redis://redis:6379
+      JOB_MODE: queue
+    depends_on: { db: { condition: service_healthy }, redis: { condition: service_started } }
+volumes: { pgdata: {} }
