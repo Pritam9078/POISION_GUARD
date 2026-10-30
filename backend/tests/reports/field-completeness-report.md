@@ -88,3 +88,4 @@ A comprehensive automated inspection of all forms, data tables, API payloads, an
 - **Laptop (1280 × 800):** Responsive layout adapts without horizontal scrolling.
 - **Tablet (768 × 1024):** Sidebar collapses into mobile drawer; tables scroll horizontally if necessary.
 - **Mobile (390 × 844):** Single-column stacked cards, responsive touch targets (min 44px).
+

@@ -25,3 +25,4 @@ describe('Security: Session Cookie Flags & Tampering Defense', () => {
     assert.equal(res.status, 401, 'Tampered cookie must return 401 Unauthorized')
   })
 })
+

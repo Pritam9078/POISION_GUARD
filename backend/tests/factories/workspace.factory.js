@@ -40,3 +40,4 @@ export async function addMemberToWorkspace({
   )
   return { id: memId, workspaceId, userId, role }
 }
+

@@ -39,3 +39,4 @@ test.describe('E2E: User Authentication & Guard Portal Access', () => {
     await expect(passwordInput).toBeVisible()
   })
 })
+

@@ -42,3 +42,4 @@ export const TEST_ADMIN = {
   email: process.env.TEST_ADMIN_EMAIL || `admin_${TEST_RUN_ID.toLowerCase()}@poison-guard.test`,
   password: process.env.TEST_ADMIN_PASSWORD || 'AdminStaff_2026!SuperSec',
 }
+

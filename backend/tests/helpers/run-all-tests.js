@@ -34,14 +34,20 @@ function runStep(name, cmd, args, extraEnv = {}) {
 // 1. API Test Suite
 runStep('API Test Suite', 'node', ['tests/helpers/run-api-tests.js'])
 
-// 2. Integration Test Suite
-runStep('Integration Test Suite', 'node', ['tests/helpers/run-integration-tests.js'])
+// 2. Integration & Adversarial Test Suite
+runStep('Integration & Adversarial Test Suite', 'node', ['tests/helpers/run-integration-tests.js'])
 
-// 3. Security Test Suite
-runStep('Security Test Suite', 'node', ['tests/helpers/run-security-tests.js'])
+// 3. Security & Workspace Authorization Matrix Suite
+runStep('Security & Authorization Matrix Suite', 'node', ['tests/helpers/run-security-tests.js'])
 
-// 4. Playwright E2E Desktop & Mobile
-runStep('Playwright E2E Suite (Public, Auth, Dashboard, Scanner)', 'npx', [
+// 4. Address Poisoning Detection Evaluation & Unit Suite
+runStep('Address Poisoning Detection Evaluation Suite', 'node', ['--test', 'tests/unit/address-poisoning-eval.test.js'])
+
+// 5. Performance Latency Baseline Suite
+runStep('Performance Latency Baseline Suite', 'node', ['--test', 'tests/performance/load-test.js'])
+
+// 6. Playwright E2E Suite (Public, Auth, Dashboard, Scanner, Deep-Nav, Forms, Accessibility)
+runStep('Playwright E2E Suite (Public, Auth, Dashboard, Deep-Nav, Forms, A11y)', 'npx', [
   'playwright', 'test',
   '--config=tests/playwright.config.js',
   '--project=desktop-chrome',
@@ -49,9 +55,12 @@ runStep('Playwright E2E Suite (Public, Auth, Dashboard, Scanner)', 'npx', [
   'tests/e2e/auth',
   'tests/e2e/scanner',
   'tests/e2e/approvals',
+  'tests/e2e/deep-nav',
+  'tests/e2e/deep-forms',
+  'tests/e2e/accessibility',
 ])
 
-// 5. Playwright E2E Admin Portal
+// 7. Playwright E2E Admin Portal
 runStep('Playwright E2E Admin Portal', 'npx', [
   'playwright', 'test',
   '--config=tests/playwright.config.js',
@@ -59,7 +68,7 @@ runStep('Playwright E2E Admin Portal', 'npx', [
   'tests/e2e/admin',
 ])
 
-// 6. Test Data Cleanup
+// 8. Test Data Cleanup
 runStep('Automated Test Data Cleanup', 'node', ['tests/cleanup/cleanup.js'])
 
 console.log('\n═══════════════════════════════════════════════════════════════')
@@ -75,3 +84,4 @@ if (allPassed) {
   console.error('⚠️ ONE OR MORE TEST SUITES ENCOUNTERED FAILURES.')
   process.exit(1)
 }
+

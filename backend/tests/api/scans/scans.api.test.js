@@ -49,3 +49,4 @@ describe('API: Scanner & Poisoning Detection Engine', () => {
     assert.ok(data.data.scanId)
   })
 })
+

@@ -35,3 +35,4 @@ describe('Security: Injection & Hostile Payload Defense', () => {
     assert.notEqual(res.status, 500)
   })
 })
+

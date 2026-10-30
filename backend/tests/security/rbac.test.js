@@ -49,3 +49,4 @@ describe('Security: Role-Based Access Control (RBAC) & Tenant Isolation', () => 
     assert.ok(res.status === 403 || res.status === 404, 'Must reject foreign workspace access with 403/404')
   })
 })
+

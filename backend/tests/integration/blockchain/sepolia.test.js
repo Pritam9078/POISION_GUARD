@@ -14,3 +14,4 @@ describe('Integration: Sepolia Public Testnet Smoke Tests', () => {
     assert.ok(blockNumber > 0, 'Must retrieve current block number on Sepolia')
   })
 })
+

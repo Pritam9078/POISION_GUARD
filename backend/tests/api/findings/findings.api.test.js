@@ -17,3 +17,4 @@ describe('API: Findings & False Positive Reporting', () => {
     assert.ok(res.status < 500, `Unexpected server error ${res.status}`)
   })
 })
+

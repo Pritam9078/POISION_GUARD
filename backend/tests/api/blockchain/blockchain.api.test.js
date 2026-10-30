@@ -16,3 +16,4 @@ describe('API: Blockchain Networks & Approvals', () => {
     assert.ok(chainIds.includes(8453), 'Base must be supported')
   })
 })
+

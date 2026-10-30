@@ -72,3 +72,4 @@ describe('API: Workspaces & RBAC', () => {
     assert.equal(data.success, true)
   })
 })
+

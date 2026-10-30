@@ -32,3 +32,4 @@ export const TEST_CHAINS = [
   { id: 137, name: 'Polygon', testnet: false },
   { id: 11155111, name: 'Sepolia Testnet', testnet: true },
 ]
+

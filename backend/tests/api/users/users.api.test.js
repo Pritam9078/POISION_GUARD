@@ -31,3 +31,4 @@ describe('API: Users & Profile Management', () => {
     assert.equal(data.data.email, TEST_USERS.pritam.email.toLowerCase())
   })
 })
+

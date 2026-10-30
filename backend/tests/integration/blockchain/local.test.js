@@ -19,3 +19,4 @@ describe('Integration: Local EVM Blockchain & Smart Contracts', () => {
     assert.ok(output.includes('ProofRegistry v2'), 'ProofRegistry v2 suite executed')
   })
 })
+
