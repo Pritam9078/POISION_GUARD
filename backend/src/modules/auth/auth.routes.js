@@ -233,7 +233,7 @@ export default async function authRoutes(app) {
       const ch = await c.one(`UPDATE wallet_challenges SET used_at = now() WHERE nonce = $1 AND used_at IS NULL RETURNING *`, [b.nonce])
       if (!ch) throw new AppError(401, 'CHALLENGE_INVALID', 'Challenge not found or already used')
       if (new Date(ch.expiresAt) < new Date()) throw new AppError(401, 'CHALLENGE_EXPIRED', 'Challenge expired — request a new one')
-      const signer = recoverSigner(ch.message, b.signature)
+      const signer = await recoverSigner(ch.message, b.signature, ch.address, ch.chainId)
       if (signer !== ch.address) {
         await audit(c, { actor: { type: 'anonymous', label: ch.address }, action: 'wallet.verify', outcome: 'failure', metadata: { reason: 'signature_mismatch' } })
         throw new AppError(401, 'SIGNATURE_INVALID', 'Signature does not match the challenged address')

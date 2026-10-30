@@ -5,6 +5,7 @@ import helmet from '@fastify/helmet'
 import rateLimit from '@fastify/rate-limit'
 import swagger from '@fastify/swagger'
 import swaggerUi from '@fastify/swagger-ui'
+import IORedis from 'ioredis'
 import { randomUUID } from 'node:crypto'
 import { env, isTest } from './config/env.js'
 import core, { allowedOrigins } from './plugins/core.js'
@@ -30,7 +31,26 @@ export async function buildApp(opts = {}) {
   await app.register(helmet, { contentSecurityPolicy: false, crossOriginResourcePolicy: { policy: 'same-site' } })
   await app.register(cors, { origin: (o, cb) => cb(null, !o || allowedOrigins().includes(o)), credentials: true, methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'] })
   await app.register(cookie, { secret: env.SESSION_SECRET })
-  await app.register(rateLimit, { global: true, max: isTest ? 100000 : 300, timeWindow: '1 minute', ...(isTest ? { allowList: () => !process.env.TEST_RATE_LIMIT } : {}) })
+
+  let rateLimitRedis = null
+  if (env.REDIS_URL && !isTest) {
+    try {
+      rateLimitRedis = new IORedis(env.REDIS_URL, { connectTimeout: 3000, maxRetriesPerRequest: 1, enableOfflineQueue: false })
+      rateLimitRedis.on('error', (err) => {
+        app.log.warn({ err: err.message }, 'Redis rate-limit client warning; fallback to in-memory store')
+      })
+    } catch (err) {
+      app.log.warn({ err: err.message }, 'Failed to initialize Redis for rate-limiting')
+    }
+  }
+
+  await app.register(rateLimit, {
+    global: true,
+    max: isTest ? 100000 : 300,
+    timeWindow: '1 minute',
+    ...(rateLimitRedis ? { redis: rateLimitRedis } : {}),
+    ...(isTest ? { allowList: () => !process.env.TEST_RATE_LIMIT } : {})
+  })
   await app.register(core)
   await app.register(swagger, { openapi: { info: { title: 'PoisonGuard API', version: '1.0.0', description: 'Public scanner, Guard workspace, agent and admin APIs. Envelope: { success, data | error, meta.requestId }.' }, servers: [{ url: env.APP_URL }] } })
   await app.register(swaggerUi, { routePrefix: '/api/docs' })
