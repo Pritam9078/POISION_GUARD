@@ -1,0 +1,26 @@
+{
+  // Suppress the VS Code built-in CSS language server's false-positive errors
+  // for Tailwind CSS v4 at-rules (@utility, @custom-variant, @source, @theme, @variant).
+  // Tailwind v4 uses these natively and the build compiles them correctly.
+  "css.customData": [".vscode/tailwind-v4.css-data.json"],
+  "css.lint.unknownAtRules": "ignore",
+  "css.validate": false,
+  "scss.validate": false,
+
+  // Use the Tailwind CSS IntelliSense extension for CSS instead of the built-in
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+
+  // File associations — treat .css files using PostCSS parser in the editor
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+
+  // Tailwind IntelliSense: point at our main stylesheet
+  "tailwindCSS.experimental.configFile": "frontend/src/styles.css",
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript",
+    "typescriptreact": "javascript"
+  }
+}

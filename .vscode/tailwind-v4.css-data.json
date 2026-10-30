@@ -1,0 +1,15 @@
+{
+  "version": 1.1,
+  "atDirectives": [
+    { "name": "@tailwind",     "description": "Tailwind base/components/utilities injection." },
+    { "name": "@apply",        "description": "Apply Tailwind utility classes inline." },
+    { "name": "@layer",        "description": "Declare a custom cascade layer." },
+    { "name": "@theme",        "description": "Tailwind v4: define design tokens." },
+    { "name": "@utility",      "description": "Tailwind v4: declare a custom utility class." },
+    { "name": "@variant",      "description": "Tailwind v4: apply a conditional variant." },
+    { "name": "@custom-variant","description": "Tailwind v4: define a custom variant." },
+    { "name": "@source",       "description": "Tailwind v4: explicit source glob for scanning." },
+    { "name": "@plugin",       "description": "Tailwind v4: register a plugin." },
+    { "name": "@config",       "description": "Tailwind v4: path to config file." }
+  ]
+}
