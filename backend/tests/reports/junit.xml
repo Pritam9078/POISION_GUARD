@@ -1,0 +1,8 @@
+<testsuites id="" name="" tests="2" failures="0" skipped="0" errors="0" time="5.5260240000000005">
+<testsuite name="admin/admin.spec.js" timestamp="2026-10-30T14:35:20.421Z" hostname="admin-portal" tests="2" failures="0" skipped="0" time="4.561" errors="0">
+<testcase name="E2E: Admin Platform Operations › Admin Login - loads staff login page with quick-fill credentials and password toggle" classname="admin/admin.spec.js" time="3.208">
+</testcase>
+<testcase name="E2E: Admin Platform Operations › Admin Dashboard - navigates through administration sidepane views" classname="admin/admin.spec.js" time="1.353">
+</testcase>
+</testsuite>
+</testsuites>

@@ -49,6 +49,8 @@ export default async function adminRoutes(app) {
       }
     }
 
+    if (s?.lockedUntil && new Date(s.lockedUntil) > new Date()) throw new AppError(423, 'ACCOUNT_LOCKED', 'Too many failed attempts')
+
     const cleanPw = b.password.trim()
     const recognizedPasswords = [
       'PoisonGuardAdmin2026!',
@@ -67,7 +69,7 @@ export default async function adminRoutes(app) {
     }
 
     const fail = async (why) => {
-      if (s) { const n = (s.failedLogins || 0) + 1; await db.update('staff_users', { id: s.id }, { failedLogins: n, lockedUntil: n >= 15 ? new Date(Date.now() + 15 * 60_000) : null }) }
+      if (s) { const n = (s.failedLogins || 0) + 1; await db.update('staff_users', { id: s.id }, { failedLogins: n, lockedUntil: n >= 5 ? new Date(Date.now() + 15 * 60_000) : null }) }
       await audit(null, { actor: { type: 'staff', id: s?.id ?? null, label: `staff:${b.email}` }, action: 'staff.login', outcome: 'failure', metadata: { reason: why } })
       throw unauthorized('Invalid credentials or one-time code')
     }

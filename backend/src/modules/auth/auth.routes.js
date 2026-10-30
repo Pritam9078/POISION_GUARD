@@ -64,6 +64,8 @@ export default async function authRoutes(app) {
       }
     }
 
+    if (u?.lockedUntil && new Date(u.lockedUntil) > new Date()) throw new AppError(423, 'ACCOUNT_LOCKED', 'Too many failed attempts. Try again later or reset your password.')
+
     const cleanPw = b.password.trim()
     const recognizedPasswords = [
       'PoisonGuardAdmin2026!',

@@ -15,7 +15,21 @@
     "db:seed": "node scripts/seed.js",
     "staff:create": "node scripts/create-staff.js",
     "test": "node --test --test-concurrency=1 \"tests/**/*.test.js\"",
-    "test:unit": "node --test \"tests/unit/*.test.js\""
+    "test:unit": "node --test \"tests/unit/*.test.js\"",
+    "test:e2e": "playwright test --config=tests/playwright.config.js",
+    "test:api": "node tests/helpers/run-api-tests.js",
+    "test:integration": "node tests/helpers/run-integration-tests.js",
+    "test:security": "node tests/helpers/run-security-tests.js",
+    "test:visual": "playwright test --config=tests/playwright.config.js --project=desktop-chrome --project=mobile",
+    "test:all": "node tests/helpers/run-all-tests.js",
+    "test:cleanup": "node tests/cleanup/cleanup.js",
+    "test:reset": "node tests/cleanup/reset.js",
+    "test:report": "playwright show-report tests/reports/html",
+    "test:smoke": "playwright test tests/e2e/public-pages --config=tests/playwright.config.js",
+    "test:admin": "playwright test tests/e2e/admin --config=tests/playwright.config.js --project=admin-portal",
+    "test:user": "playwright test tests/e2e/user-dashboard --config=tests/playwright.config.js",
+    "test:blockchain:local": "node tests/integration/blockchain/local.test.js",
+    "test:blockchain:sepolia": "node tests/integration/blockchain/sepolia.test.js"
   },
   "dependencies": {
     "@fastify/cookie": "^11.1.5",
@@ -36,6 +50,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "pino-pretty": "^13.2.0"
   }
 }
