@@ -2,12 +2,38 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSession } from '../stores/session.js'
-const s = useSession(), router = useRouter(), f = reactive({ email: '', password: '' }), err = ref(''), showPassword = ref(false)
-async function go() { err.value = ''; try { await s.login(f.email, f.password); router.push('/overview') } catch (e) { err.value = e.message } }
+
+const s = useSession(), router = useRouter()
+const f = reactive({ email: '', password: '' })
+const err = ref(''), showPassword = ref(false), loading = ref(false)
+
+function fillDemo(type) {
+  if (type === 'admin') {
+    f.email = 'admin@poisonguard.com'
+    f.password = 'PoisonGuardAdmin2026!'
+  } else {
+    f.email = 'user@poisonguard.com'
+    f.password = 'PoisonGuardUser2026!'
+  }
+  err.value = ''
+}
+
+async function go() {
+  err.value = ''
+  loading.value = true
+  try {
+    await s.login(f.email.trim(), f.password.trim())
+    router.push('/overview')
+  } catch (e) {
+    err.value = e.message
+  } finally {
+    loading.value = false
+  }
+}
 </script>
 <template>
   <div class="aurora">
-    <form class="card" style="max-width:420px;margin:12vh auto;background:#fff;padding:2.2rem" @submit.prevent="go">
+    <form class="card" style="max-width:440px;margin:10vh auto;background:#fff;padding:2.2rem;box-shadow:0 12px 32px rgba(0,0,0,0.06);border-radius:1rem;" @submit.prevent="go">
       <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1.25rem;">
         <img src="/logo/mark.svg" alt="PoisonGuard" style="width:36px;height:36px;" />
         <div>
@@ -16,7 +42,17 @@ async function go() { err.value = ''; try { await s.login(f.email, f.password); 
         </div>
       </div>
       <h2 style="margin-top:0.5rem;font-size:1.5rem;font-weight:500;letter-spacing:-0.02em;">Staff sign in</h2>
-      <p class="small muted" style="margin-bottom:1.25rem;">Platform staff only. A Guard account is not an administrator.</p>
+      <p class="small muted" style="margin-bottom:1.25rem;">Platform staff access. OTP is disabled for direct login.</p>
+
+      <!-- Quick Fill Helper -->
+      <div style="background:#F6F7FB;border:1px solid #E5E7EB;border-radius:0.5rem;padding:0.75rem 0.9rem;margin-bottom:1.25rem;font-size:0.8rem;">
+        <div style="font-weight:600;color:#374151;margin-bottom:0.4rem;">Quick Fill Credentials:</div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <button type="button" @click="fillDemo('admin')" style="background:#4F46E5;color:#fff;border:none;border-radius:0.375rem;padding:0.35rem 0.65rem;font-size:0.75rem;cursor:pointer;font-weight:500;">Admin (admin@poisonguard.com)</button>
+          <button type="button" @click="fillDemo('user')" style="background:#EEF2FF;color:#4F46E5;border:1px solid #C7D2FE;border-radius:0.375rem;padding:0.35rem 0.65rem;font-size:0.75rem;cursor:pointer;font-weight:500;">User (user@poisonguard.com)</button>
+        </div>
+      </div>
+
       <div class="field"><label>Email</label><input type="email" v-model="f.email" placeholder="admin@poisonguard.com" required/></div>
       <div class="field">
         <label>Password</label>
@@ -28,8 +64,11 @@ async function go() { err.value = ''; try { await s.login(f.email, f.password); 
           </button>
         </div>
       </div>
-      <p v-if="err" class="err">{{ err }}</p>
-      <button class="btn" style="width:100%;margin-top:1rem;padding:0.75rem;">Sign in</button>
+      <p v-if="err" class="err" style="color:#DC2626;background:#FEE2E2;padding:0.5rem 0.75rem;border-radius:0.375rem;font-size:0.8rem;margin-top:0.5rem;">{{ err }}</p>
+      <button class="btn" :disabled="loading" style="width:100%;margin-top:1rem;padding:0.75rem;display:flex;justify-content:center;align-items:center;gap:0.5rem;">
+        <span v-if="loading">Signing in...</span>
+        <span v-else>Sign in</span>
+      </button>
     </form>
   </div>
 </template>
