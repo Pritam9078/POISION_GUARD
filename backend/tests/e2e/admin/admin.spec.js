@@ -1,21 +1,16 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('E2E: Admin Platform Operations', () => {
-  test('Admin Login - loads staff login page with quick-fill credentials and password toggle', async ({ page }) => {
+  test('Admin Login - loads staff login page with secure credentials input and password toggle', async ({ page }) => {
     await page.goto('/login')
     await expect(page.locator('text=PoisonGuard').first()).toBeVisible()
     await expect(page.locator('text=Staff sign in')).toBeVisible()
 
-    // Verify Quick Fill buttons exist
-    const adminFillBtn = page.locator('button:has-text("Admin (admin@poisonguard.com)")')
-    await expect(adminFillBtn).toBeVisible()
-
-    // Click quick fill
-    await adminFillBtn.click()
-
-    // Assert inputs are populated
+    // Populate credentials
     const emailInput = page.locator('input[type="email"]')
-    const passwordInput = page.locator('input[name="password"], input[type="password"], input[type="text"]')
+    await emailInput.fill('admin@poisonguard.com')
+    const passwordInput = page.locator('input[name="password"], input[type="password"]')
+    await passwordInput.fill('PoisonGuardAdmin2026!')
     await expect(emailInput).toHaveValue('admin@poisonguard.com')
 
     // Test show/hide password toggle
@@ -39,9 +34,10 @@ test.describe('E2E: Admin Platform Operations', () => {
   test('Admin Dashboard - navigates through administration sidepane views', async ({ page }) => {
     // Navigate with pre-authenticated state or login
     await page.goto('/login')
-    const adminFillBtn = page.locator('button:has-text("Admin (admin@poisonguard.com)")')
-    if (await adminFillBtn.count() > 0) {
-      await adminFillBtn.click()
+    const emailInput = page.locator('input[type="email"]')
+    if (await emailInput.isVisible()) {
+      await emailInput.fill('admin@poisonguard.com')
+      await page.locator('input[name="password"], input[type="password"]').fill('PoisonGuardAdmin2026!')
       await page.locator('button:has-text("Sign in")').click()
       await expect(page).toHaveURL(/.*\/overview/, { timeout: 10000 })
     }

@@ -191,8 +191,7 @@ export function AdminSignInRequired() {
         <Logo to="/admin/login" />
         <h1 className="mt-6 font-display text-xl font-medium">Platform staff sign-in required</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Admin routes are for authorized PoisonGuard staff only. In this demo any credentials open the console — real
-          privileged auth comes with the backend phase.
+          Admin routes are for authorized PoisonGuard platform staff only. Please sign in with your staff credentials.
         </p>
         <Button asChild className="mt-6 w-full rounded-full">
           <Link to="/admin/login">Go to staff sign-in</Link>

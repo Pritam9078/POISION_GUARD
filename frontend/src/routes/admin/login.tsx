@@ -55,7 +55,7 @@ function AdminLogin() {
         <form className="mt-6 space-y-4" onSubmit={submit}>
           <div className="space-y-1.5">
             <Label htmlFor="a-email">Staff email</Label>
-            <Input id="a-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@poisonguard.example" required />
+            <Input id="a-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="staff@company.com" required />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="a-password">Password</Label>

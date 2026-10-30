@@ -77,7 +77,7 @@ function GuardRegister() {
         <form className="mt-6 space-y-4" onSubmit={submit}>
           <div className="space-y-1.5">
             <Label htmlFor="name">Full name</Label>
-            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Pritam Das" required />
+            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" required />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="email">Work email</Label>
