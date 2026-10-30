@@ -69,7 +69,7 @@ export function HeroIntro() {
           for autonomous AI agents.
         </p>
 
-        {/* CTA group */}
+        {/* CTA group — primary + secondary only */}
         <div
           className="pg-word-in mt-7 flex flex-wrap items-center gap-3"
           style={{ animationDelay: "450ms" }}
@@ -80,24 +80,23 @@ export function HeroIntro() {
           <Button asChild variant="outline" size="lg" className="rounded-full bg-white/60 px-6 backdrop-blur-md">
             <Link to="/guard/login">Open Guard Workspace</Link>
           </Button>
-          <Button asChild variant="ghost" size="lg" className="rounded-full text-muted-foreground hover:text-foreground">
-            <Link to="/admin/login">Admin Portal</Link>
-          </Button>
         </div>
 
-        {/* Live Protection — clean inline pill row, no boxy card */}
+        {/* Live Protection — dashed transparent-border pill */}
         <div
-          className="pg-word-in mt-6 flex items-center gap-2.5 text-xs text-muted-foreground"
+          className="pg-word-in mt-6"
           style={{ animationDelay: "560ms" }}
         >
-          {/* Animated pulse dot */}
-          <span className="relative flex size-2 shrink-0">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
-            <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
-          </span>
-          <span className="font-medium text-foreground">Live Protection Active</span>
-          <span className="text-border">·</span>
-          <span>Real-time lookalike &amp; zero-value dust detection across 7 EVM networks</span>
+          <div className="inline-flex items-center gap-2.5 rounded-full border border-dashed border-foreground/20 bg-transparent px-4 py-2 text-xs backdrop-blur-sm">
+            {/* Animated pulse dot */}
+            <span className="relative flex size-2 shrink-0">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
+              <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
+            </span>
+            <span className="font-semibold text-foreground">Live Protection Active</span>
+            <span className="text-foreground/25">·</span>
+            <span className="text-muted-foreground">Real-time lookalike &amp; zero-value dust detection across 7 EVM networks</span>
+          </div>
         </div>
       </div>
 
@@ -271,8 +270,8 @@ function Index() {
                           scanResult.riskLabel === "elevated"
                             ? "medium"
                             : scanResult.riskLabel === "inconclusive"
-                            ? "info"
-                            : scanResult.riskLabel
+                              ? "info"
+                              : scanResult.riskLabel
                         }
                       />
                       <Badge variant="outline" className="rounded-full text-[10px] font-mono capitalize">
