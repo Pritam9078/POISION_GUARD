@@ -5,8 +5,9 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Logo, DemoDataNote } from "@/components/pg/kit";
+import { Logo } from "@/components/pg/kit";
 import { useDemoAuth } from "@/lib/demo-auth";
+import { api } from "@/lib/api";
 
 export const Route = createFileRoute("/guard/login")({
   component: GuardLogin,
@@ -20,9 +21,10 @@ function GuardLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  const submit = (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!email.includes("@")) {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail.includes("@")) {
       toast.error("Enter a valid email address.");
       return;
     }
@@ -31,12 +33,26 @@ function GuardLogin() {
       return;
     }
     setBusy(true);
-    setTimeout(() => {
-      const handle = (email.split("@")[0] ?? email).replace(/^./, (c) => c.toUpperCase());
-      signIn("guard", email, handle);
-      toast.success("Signed in — demo session active");
+    try {
+      const res = await api<{
+        user: { id: string; name: string; email: string };
+        memberships: Array<{ workspaceId: string; role: string; workspaceName?: string }>;
+      }>("/auth/login", {
+        method: "POST",
+        body: { email: cleanEmail, password },
+      });
+
+      const firstMem = res.memberships?.[0];
+      const wsName = firstMem?.workspaceName || `${res.user.name}'s Workspace`;
+      signIn("guard", res.user.email, res.user.name, res.user.id, firstMem?.workspaceId, wsName, res.memberships);
+      toast.success(`Signed in as ${res.user.name}`);
       navigate({ to: "/guard/overview" });
-    }, 350);
+    } catch (err: any) {
+      // In case backend is completely offline, inform user or allow graceful access
+      toast.error(err.message || "Invalid email or password.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -49,12 +65,21 @@ function GuardLogin() {
         <form className="mt-6 space-y-4" onSubmit={submit}>
           <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="you@company.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <Input
+              id="email"
+              type="email"
+              placeholder="you@company.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <Link to="/guard/forgot-password" className="text-xs text-muted-foreground hover:text-foreground">Forgot password?</Link>
+              <Link to="/guard/forgot-password" className="text-xs text-muted-foreground hover:text-foreground">
+                Forgot password?
+              </Link>
             </div>
             <div className="relative flex items-center">
               <Input
@@ -82,9 +107,10 @@ function GuardLogin() {
         </form>
         <p className="mt-4 text-center text-sm text-muted-foreground">
           New to PoisonGuard?{" "}
-          <Link to="/guard/register" className="font-medium text-foreground underline-offset-4 hover:underline">Create an account</Link>
+          <Link to="/guard/register" className="font-medium text-foreground underline-offset-4 hover:underline">
+            Create an account
+          </Link>
         </p>
-        <DemoDataNote className="mt-6" />
       </div>
     </div>
   );

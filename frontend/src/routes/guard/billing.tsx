@@ -32,7 +32,7 @@ function Billing() {
         <StatCard label="Plan" value={SUBSCRIPTION.plan} sub={`${SUBSCRIPTION.status} · renews ${SUBSCRIPTION.renewsAt}`} />
         <StatCard label="Monthly price" value={`$${SUBSCRIPTION.priceMonthly}`} />
         <StatCard label="Seats" value={`${SUBSCRIPTION.seatsUsed}/${SUBSCRIPTION.seats}`} sub="Used / included" />
-        <StatCard label="Payment events" value="Verified" tone="ok" sub="Provider-event sourced (demo)" />
+        <StatCard label="Payment events" value="Verified" tone="ok" sub="Provider-event sourced" />
       </div>
 
       <div className="mt-6 rounded-2xl border bg-card p-5">

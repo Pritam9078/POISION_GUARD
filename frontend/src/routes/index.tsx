@@ -548,14 +548,14 @@ function Index() {
               Ready to secure your crypto operations?
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-sm text-muted-foreground">
-              Sign in with one click to explore the complete Guard workspace and platform administration dashboard.
+              Sign in to access the complete Guard workspace and platform administration dashboard.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Button asChild size="lg" className="rounded-full px-6">
                 <Link to="/guard/login">Open Guard Workspace</Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-full px-6">
-                <Link to="/admin/login">Admin Portal Demo</Link>
+                <Link to="/admin/login">Admin Portal</Link>
               </Button>
             </div>
           </div>

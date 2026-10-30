@@ -96,7 +96,7 @@ export function ScanResultPage() {
               </Badge>
             </div>
             <h1 className="mt-2 font-display text-2xl font-light tracking-tight text-foreground sm:text-4xl">
-              Scan Analysis: <span className="font-mono text-base font-normal sm:text-2xl">{scan.subject}</span>
+              Scan Analysis: <span className="break-all font-mono text-base font-normal sm:text-2xl">{scan.subject}</span>
             </h1>
             <p className="mt-1 text-xs text-muted-foreground">
               Requested {scan.requestedAt} · Completed {scan.completedAt}
@@ -113,12 +113,12 @@ export function ScanResultPage() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="mt-8 flex flex-wrap gap-1.5 border-b pb-3">
+        <div className="mt-8 flex gap-1.5 overflow-x-auto border-b pb-3 no-scrollbar sm:flex-wrap">
           {TABS.map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
+              className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
                 tab === t
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:bg-secondary hover:text-foreground"

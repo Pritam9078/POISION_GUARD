@@ -47,7 +47,7 @@ const NAV_GROUPS: { title: string; items: { label: string; to: string; icon: typ
       { label: "Wallets", to: "/guard/wallets", icon: Wallet },
       { label: "Trusted recipients", to: "/guard/recipients", icon: Users },
       { label: "Scans", to: "/guard/scans", icon: FileSearch },
-      { label: "Approvals", to: "/guard/approvals", icon: ShieldCheck, badge: 1 },
+      { label: "Approvals", to: "/guard/approvals", icon: ShieldCheck },
     ],
   },
   {
@@ -117,7 +117,7 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 export function GuardShell({ children }: { children: ReactNode }) {
-  const { session, signOut } = useDemoAuth();
+  const { session, switchWorkspace, signOut } = useDemoAuth();
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const unread = NOTIFICATIONS.filter((n) => !n.read).length;
@@ -131,9 +131,6 @@ export function GuardShell({ children }: { children: ReactNode }) {
         </div>
         <div className="mt-6 flex-1 overflow-y-auto">
           <NavList />
-        </div>
-        <div className="border-t pt-3">
-          <DemoDataNote />
         </div>
       </aside>
 
@@ -153,7 +150,7 @@ export function GuardShell({ children }: { children: ReactNode }) {
                   <div className="mt-6"><NavList onNavigate={() => setOpen(false)} /></div>
                 </SheetContent>
               </Sheet>
-              {/* Workspace switcher (demo) */}
+              {/* Workspace switcher */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="rounded-full bg-card font-medium">
@@ -161,11 +158,33 @@ export function GuardShell({ children }: { children: ReactNode }) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-60">
-                  <DropdownMenuLabel className="text-xs text-muted-foreground">Workspaces (demo)</DropdownMenuLabel>
-                  <DropdownMenuItem className="justify-between">
-                    Nordguard Labs <Badge variant="secondary" className="rounded-full">current</Badge>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>Delta Custody <span className="ml-auto text-xs text-muted-foreground">Auditor</span></DropdownMenuItem>
+                  <DropdownMenuLabel className="text-xs text-muted-foreground">Workspaces</DropdownMenuLabel>
+                  {session?.memberships && session.memberships.length > 0 ? (
+                    session.memberships.map((m) => {
+                      const name = m.workspaceName || m.workspace?.name || "Workspace";
+                      const id = m.workspaceId || m.workspace?.id || "";
+                      const isCurrent = id === session.workspaceId;
+                      return (
+                        <DropdownMenuItem
+                          key={id}
+                          className="justify-between"
+                          onClick={() => switchWorkspace(id, name)}
+                        >
+                          <span className="truncate">{name}</span>
+                          {isCurrent ? (
+                            <Badge variant="secondary" className="rounded-full">current</Badge>
+                          ) : (
+                            <span className="ml-auto text-xs text-muted-foreground capitalize">{m.role}</span>
+                          )}
+                        </DropdownMenuItem>
+                      );
+                    })
+                  ) : (
+                    <DropdownMenuItem className="justify-between">
+                      {session?.workspace ?? "My Workspace"}{" "}
+                      <Badge variant="secondary" className="rounded-full">current</Badge>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild><Link to="/guard/workspaces">Manage workspaces</Link></DropdownMenuItem>
                 </DropdownMenuContent>
@@ -216,7 +235,7 @@ export function GuardShell({ children }: { children: ReactNode }) {
   );
 }
 
-/** Shown when no demo session exists for Guard. */
+/** Shown when no session exists for Guard. */
 export function GuardSignInRequired() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -224,8 +243,7 @@ export function GuardSignInRequired() {
         <Logo />
         <h1 className="mt-6 font-display text-xl font-medium">Guard sign-in required</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          The Guard workspace is protected. In this frontend demo, any credentials sign you in — real authentication
-          arrives with the backend phase.
+          The Guard workspace is protected. Please sign in to access your security workspace.
         </p>
         <Button asChild className="mt-6 w-full rounded-full">
           <Link to="/guard/login">Go to sign in</Link>

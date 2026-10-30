@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Logo, DemoDataNote } from "@/components/pg/kit";
+import { Logo } from "@/components/pg/kit";
 import { useDemoAuth } from "@/lib/demo-auth";
+import { api } from "@/lib/api";
 
 export const Route = createFileRoute("/guard/register")({
   component: GuardRegister,
@@ -23,13 +24,16 @@ function GuardRegister() {
   const [accepted, setAccepted] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  const submit = (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (name.trim().length < 2) {
+    const cleanName = name.trim();
+    const cleanEmail = email.trim().toLowerCase();
+
+    if (cleanName.length < 2) {
       toast.error("Enter your full name.");
       return;
     }
-    if (!email.includes("@")) {
+    if (!cleanEmail.includes("@")) {
       toast.error("Enter a valid email address.");
       return;
     }
@@ -42,11 +46,25 @@ function GuardRegister() {
       return;
     }
     setBusy(true);
-    setTimeout(() => {
-      signIn("guard", email, name.trim());
-      toast.success("Account created — demo session active");
-      navigate({ to: "/guard/workspaces" });
-    }, 350);
+    try {
+      const res = await api<{
+        user: { id: string; name: string; email: string };
+        memberships: Array<{ workspaceId: string; role: string; workspaceName?: string }>;
+      }>("/auth/register", {
+        method: "POST",
+        body: { name: cleanName, email: cleanEmail, password },
+      });
+
+      const firstMem = res.memberships?.[0];
+      const wsName = firstMem?.workspaceName || `${cleanName}'s Workspace`;
+      signIn("guard", res.user.email, res.user.name, res.user.id, firstMem?.workspaceId, wsName, res.memberships);
+      toast.success("Account created successfully!");
+      navigate({ to: "/guard/overview" });
+    } catch (err: any) {
+      toast.error(err.message || "Failed to create account.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -59,7 +77,7 @@ function GuardRegister() {
         <form className="mt-6 space-y-4" onSubmit={submit}>
           <div className="space-y-1.5">
             <Label htmlFor="name">Full name</Label>
-            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ava Chen" required />
+            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Pritam Das" required />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="email">Work email</Label>
@@ -99,10 +117,11 @@ function GuardRegister() {
           </Button>
         </form>
         <p className="mt-4 text-center text-sm text-muted-foreground">
-          Already registered?{" "}
-          <Link to="/guard/login" className="font-medium text-foreground underline-offset-4 hover:underline">Sign in</Link>
+          Already have an account?{" "}
+          <Link to="/guard/login" className="font-medium text-foreground underline-offset-4 hover:underline">
+            Sign in
+          </Link>
         </p>
-        <DemoDataNote className="mt-6" />
       </div>
     </div>
   );

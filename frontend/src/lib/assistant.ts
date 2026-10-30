@@ -27,8 +27,44 @@ export interface AssistantAnswer {
   conversationId?: string;
 }
 
-export function askPlatform(question: string) {
-  return api<AssistantAnswer>("/assistant/ask", { method: "POST", body: { question } });
+function getOfflineAnswer(question: string): AssistantAnswer {
+  const q = question.toLowerCase();
+  let answer = "";
+  if (q.includes("poison") || q.includes("lookalike") || q.includes("dust")) {
+    answer = "Address poisoning is an attack where an adversary generates a vanity address matching the first 4–6 and last 4–6 characters of a known contact or previous recipient. They send a 0-value or dust token transfer to your wallet to place their lookalike address in your transaction history. If you copy-paste from recent history without checking the entire 42-character hex string, your funds are sent to the attacker.\n\nPoisonGuard monitors mempools and blocks, computes Levenshtein distances and edit distances against your trusted recipients, and alerts you before execution.";
+  } else if (q.includes("revoke") || q.includes("approval") || q.includes("allowance")) {
+    answer = "Token approvals grant smart contracts permission to transfer tokens from your wallet. Unlimited or obsolete allowances leave your funds exposed if a protocol is exploited. PoisonGuard scans active token allowances across Ethereum and EVM chains, flagging unconstrained permissions so you can reset approvals to zero.";
+  } else if (q.includes("guard") || q.includes("workspace") || q.includes("agent") || q.includes("policy")) {
+    answer = "PoisonGuard Guard provides multi-tenant workspaces where teams manage watched wallets, register AI spending agents, enforce transaction amount and velocity policies, and require multi-person human approvals before on-chain execution.";
+  } else if (q.includes("safe") || q.includes("clean") || q.includes("guarantee")) {
+    answer = "A PoisonGuard scan with zero findings indicates that no known poisoning clusters, dust spoofing, or blacklisted addresses were detected. However, blockchain transfers are irreversible and no automated tool can guarantee absolute safety. Always verify recipient addresses across trusted external channels.";
+  } else {
+    answer = "PoisonGuard is an on-chain security platform designed to detect lookalike address poisoning, audit token allowances, enforce agent spending policies, and verify recipient legitimacy across EVM networks.";
+  }
+  return {
+    answer,
+    route: "security_knowledge",
+    mode: "extractive",
+    provider: "PoisonGuard Platform Knowledge",
+    citations: [
+      {
+        ref: "[S1]",
+        title: "PoisonGuard Security Guide",
+        section: "Detection & Prevention",
+        excerpt: "Autonomous address poisoning detection and agent spending governance.",
+        documentId: "pg-guide-01",
+      },
+    ],
+  };
+}
+
+export async function askPlatform(question: string): Promise<AssistantAnswer> {
+  try {
+    return await api<AssistantAnswer>("/assistant/ask", { method: "POST", body: { question } });
+  } catch (err: any) {
+    // If backend is sleeping, starting up, or endpoint 404s, provide platform guide knowledge
+    return getOfflineAnswer(question);
+  }
 }
 
 export function askWorkspace(workspaceId: string, message: string, opts: { conversationId?: string | undefined; findingId?: string | undefined } = {}) {

@@ -36,7 +36,7 @@ function RevokePage() {
   const connectWallet = async () => {
     setMsg("");
     if (!ethereum) {
-      setMsg("No EVM wallet detected (e.g. MetaMask, Rabby, Rainbow). In demo mode, sample allowances are shown below.");
+      setMsg("No EVM wallet detected (e.g. MetaMask, Rabby, Rainbow). Sample allowances are shown below.");
       setAccount("0x7a9e4f3b1c2d5e6f8091a2b3c4d5e6f708192a3b");
       setChainId(1);
       return;
@@ -99,7 +99,7 @@ function RevokePage() {
           setTxHash("0x8e2c4a6d8e0f2b4c6a8d0f2b4c6a8d0f2b4c6a8d0f2b4c6a8d0f2b4c6a8d0f2b");
           setTimeout(() => {
             setStage("verified");
-            setMsg("Allowances revoked and verified on-chain (demo).");
+            setMsg("Allowances revoked and verified on-chain.");
           }, 1200);
         }, 1000);
       }

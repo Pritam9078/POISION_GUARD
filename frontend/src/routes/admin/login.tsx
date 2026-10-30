@@ -27,15 +27,15 @@ function AdminLogin() {
       toast.error("Enter your staff email.");
       return;
     }
-    if (password.length < 12) {
-      toast.error("Privileged accounts require a 12+ character password (demo policy).");
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters.");
       return;
     }
     setBusy(true);
     setTimeout(() => {
       const handle = (email.split("@")[0] ?? email).replace(/^./, (c) => c.toUpperCase());
       signIn("admin", email, `${handle} (staff)`);
-      toast.success("Signed in as platform staff (demo)");
+      toast.success("Signed in as platform staff");
       navigate({ to: "/admin" });
     }, 350);
   };

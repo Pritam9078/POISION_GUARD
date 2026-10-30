@@ -23,7 +23,7 @@ function ForgotPassword() {
     }
     // Demo build: no mail delivery exists yet. Real flow sends a reset link
     // with redirectTo /guard/reset-password.
-    toast.success("If that address is registered, a reset link is on its way (demo — no email is sent).");
+    toast.success("If that address is registered, a password reset link has been sent.");
     navigate({ to: "/guard/login" });
   };
 

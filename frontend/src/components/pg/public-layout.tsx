@@ -104,20 +104,20 @@ export function PublicLayout({ children, bare = false }: { children: ReactNode; 
         </div>
       </header>
 
-      <main className={cn("relative z-10", bare ? "" : "mx-auto max-w-6xl px-4 pb-20 sm:px-6")}>{children}</main>
+      <main className={cn("relative z-10", bare ? "" : "mx-auto max-w-6xl px-4 pb-24 sm:px-6")}>{children}</main>
       <HelpWidget />
 
       <footer className="relative z-10 border-t bg-card/60 backdrop-blur">
-        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-          <div className="grid gap-8 md:grid-cols-4">
-            <div>
+        <div className="mx-auto max-w-6xl px-4 py-10 pb-28 sm:px-6 sm:pb-12">
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+            <div className="col-span-2 md:col-span-1">
               <Logo />
               <p className="mt-3 max-w-xs text-xs text-muted-foreground">
                 Analyze, explain, authorize, and verify — never blindly execute.
               </p>
             </div>
             {FOOTER_COLS.map((col) => (
-              <div key={col.title}>
+              <div key={col.title} className="col-span-1">
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{col.title}</h3>
                 <ul className="mt-3 space-y-2">
                   {col.links.map((l) => (
