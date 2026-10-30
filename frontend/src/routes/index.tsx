@@ -88,11 +88,6 @@ export function HeroIntro() {
           style={{ animationDelay: "560ms" }}
         >
           <div className="inline-flex items-center gap-2.5 rounded-full border border-dashed border-foreground/20 bg-transparent px-4 py-2 text-xs backdrop-blur-sm">
-            {/* Animated pulse dot */}
-            <span className="relative flex size-2 shrink-0">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
-              <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
-            </span>
             <span className="font-semibold text-foreground">Live Protection Active</span>
             <span className="text-foreground/25">·</span>
             <span className="text-muted-foreground">Real-time lookalike &amp; zero-value dust detection across 7 EVM networks</span>
