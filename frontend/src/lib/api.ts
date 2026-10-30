@@ -9,7 +9,22 @@ import {
 } from "./fixtures";
 import { isValidAddress, isValidTxHash } from "./validation";
 
-const BASE = (import.meta as any).env?.VITE_API_BASE || "/api/v1";
+const REMOTE_BACKEND = "https://poisonguard-backend.onrender.com/api/v1";
+
+export function resolveApiBase(): string {
+  const envBase = (import.meta as any).env?.VITE_API_BASE || (import.meta as any).env?.VITE_API_URL;
+  if (envBase) {
+    const trimmed = String(envBase).replace(/\/$/, "");
+    return trimmed.endsWith("/api/v1") ? trimmed : `${trimmed}/api/v1`;
+  }
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    if (host.includes("vercel.app") || host.includes("poisonguard") || (!host.includes("localhost") && !host.includes("127.0.0.1"))) {
+      return REMOTE_BACKEND;
+    }
+  }
+  return "/api/v1";
+}
 
 export class ApiError extends Error {
   code: string;
@@ -25,6 +40,7 @@ export async function api<T = any>(
   path: string,
   { method = "GET", body }: { method?: string; body?: any } = {},
 ): Promise<T> {
+  const base = resolveApiBase();
   let res: Response;
   const init: RequestInit = {
     method,
@@ -36,9 +52,22 @@ export async function api<T = any>(
   }
 
   try {
-    res = await fetch(BASE + path, init);
+    res = await fetch(base + path, init);
+    // If local/relative path returned 404, fallback directly to the live Render backend
+    if (!res.ok && res.status === 404 && base !== REMOTE_BACKEND) {
+      res = await fetch(REMOTE_BACKEND + path, init);
+    }
   } catch {
-    throw new ApiError("NETWORK", "Cannot reach the PoisonGuard API backend.", 0);
+    // If primary fetch failed with network error, attempt fallback to remote backend
+    if (base !== REMOTE_BACKEND) {
+      try {
+        res = await fetch(REMOTE_BACKEND + path, init);
+      } catch {
+        throw new ApiError("NETWORK", "Cannot reach the PoisonGuard API backend.", 0);
+      }
+    } else {
+      throw new ApiError("NETWORK", "Cannot reach the PoisonGuard API backend.", 0);
+    }
   }
 
   let json: any = null;

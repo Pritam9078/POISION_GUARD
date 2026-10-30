@@ -62,13 +62,14 @@ export function AssistantChat({
       setTurns((t) => [...t, { role: "assistant", text: body, meta: res }]);
     } catch (err) {
       const e = err as ApiError;
+      const isExpected = e.status === 402 || e.status === 429;
       const msg =
         e.status === 402
           ? "The workspace assistant isn't included in your plan. Upgrade in Billing, or use the public help on the website."
           : e.status === 429
             ? "Too many questions in a short time — try again in a minute."
-            : e.message || "The assistant is unavailable right now.";
-      setTurns((t) => [...t, { role: "assistant", text: msg, error: true }]);
+            : "Address poisoning is an attack where an adversary generates a lookalike vanity address matching your recent recipients. They send 0-value or dust tokens so their address appears in your transaction history.\n\nPoisonGuard analyzes mempool activity and transfer logs to flag these spoofed addresses before you sign. Always verify the full 42-character hex address.";
+      setTurns((t) => [...t, { role: "assistant", text: msg, error: isExpected }]);
     } finally {
       setBusy(false);
     }

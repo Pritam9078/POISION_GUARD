@@ -67,11 +67,19 @@ export async function askPlatform(question: string): Promise<AssistantAnswer> {
   }
 }
 
-export function askWorkspace(workspaceId: string, message: string, opts: { conversationId?: string | undefined; findingId?: string | undefined } = {}) {
-  return api<AssistantAnswer>(`/workspaces/${encodeURIComponent(workspaceId)}/assistant/chat`, {
-    method: "POST",
-    body: { message, ...opts },
-  });
+export async function askWorkspace(
+  workspaceId: string,
+  message: string,
+  opts: { conversationId?: string | undefined; findingId?: string | undefined } = {},
+): Promise<AssistantAnswer> {
+  try {
+    return await api<AssistantAnswer>(`/workspaces/${encodeURIComponent(workspaceId)}/assistant/chat`, {
+      method: "POST",
+      body: { message, ...opts },
+    });
+  } catch (err: any) {
+    return getOfflineAnswer(message);
+  }
 }
 
 /** Resolves the signed-in user's current workspace id (remembered per browser). */

@@ -182,14 +182,14 @@ export function OrbScene({ speed = 1, className }: Props) {
     const io = new IntersectionObserver(([e]) => { if (e) visible = e.isIntersecting; }); io.observe(host);
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const clock = new THREE.Clock();
+    const startMs = performance.now();
     const tmp = new THREE.Vector3();
     let raf = 0, frame = 0, camY = 4.8;
 
     const loop = () => {
       raf = requestAnimationFrame(loop);
       if (!visible) return;
-      const t = still ? 0 : clock.getElapsedTime() * speed;
+      const t = still ? 0 : ((performance.now() - startMs) / 1000) * speed;
 
       // vertical drop into socket, small orbit that closes as it lands, spin on own axis
       const k = (Math.sin(t * 1.1) + 1) / 2, e = k * k * (3 - 2 * k);
