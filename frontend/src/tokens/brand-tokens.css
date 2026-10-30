@@ -1,0 +1,20 @@
+:root{
+  --pg-ink: #0F1115;
+  --pg-white: #FFFFFF;
+  --pg-mist: #F7F8FC;
+  --pg-cloud: #F1F2F5;
+  --pg-slate: #6B7080;
+  --pg-sky: #CFE0FB;
+  --pg-periwinkle: #8DA6F4;
+  --pg-violet: #A99AF6;
+  --pg-lilac: #F0DDF8;
+  --pg-risk-critical: #B42318;
+  --pg-risk-high: #C4540A;
+  --pg-risk-medium: #B7791F;
+  --pg-risk-low: #3B5BDB;
+  --pg-risk-verified: #1E7F52;
+  --pg-gradient: linear-gradient(135deg, #CFE0FB 0%, #8DA6F4 50%, #A99AF6 100%);
+  --pg-aurora: radial-gradient(60% 50% at 15% 10%, #CFE0FB, transparent 70%), radial-gradient(55% 55% at 85% 25%, #A99AF6, transparent 70%), radial-gradient(60% 50% at 60% 100%, #8DA6F4, transparent 70%), #EEF1FB;
+  --pg-font-display: "Inter Tight", "Inter", system-ui, sans-serif;
+  --pg-radius-card: 24px; --pg-radius-float: 40px; --pg-radius-pill: 999px;
+}
