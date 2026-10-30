@@ -46,9 +46,30 @@ function shadowTexture() {
   c.width = c.height = 128;
   const g = c.getContext("2d")!;
   const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64);
-  gr.addColorStop(0, "rgba(20,35,70,.55)"); gr.addColorStop(1, "rgba(20,35,70,0)");
+  gr.addColorStop(0, "rgba(20,35,70,.45)"); gr.addColorStop(1, "rgba(20,35,70,0)");
   g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
   return new THREE.CanvasTexture(c);
+}
+
+/**
+ * Generates a soft, cohesive periwinkle-lavender radial gradient texture
+ * for the inner platform socket to match PoisonGuard's brand palette.
+ */
+function socketTexture() {
+  const c = document.createElement("canvas");
+  c.width = c.height = 512;
+  const g = c.getContext("2d")!;
+  const rad = g.createRadialGradient(256, 256, 12, 256, 256, 256);
+  // Soft periwinkle center blending to lavender and subtle sky rim
+  rad.addColorStop(0, "rgba(125, 148, 223, 0.75)");
+  rad.addColorStop(0.55, "rgba(141, 166, 244, 0.65)");
+  rad.addColorStop(0.82, "rgba(169, 154, 246, 0.55)");
+  rad.addColorStop(1, "rgba(207, 224, 251, 0.7)");
+  g.fillStyle = rad;
+  g.fillRect(0, 0, 512, 512);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
 }
 
 export function OrbScene({ speed = 1, className }: Props) {
@@ -72,22 +93,54 @@ export function OrbScene({ speed = 1, className }: Props) {
     const pmrem = new THREE.PMREMGenerator(renderer);
     scene.environment = pmrem.fromEquirectangular(envTex).texture;
 
-    scene.add(new THREE.AmbientLight(0xffffff, 1.8));
-    const sun = new THREE.DirectionalLight(0xffffff, 2.7);
-    sun.position.set(-4, 8, 5); scene.add(sun);
+    // Balanced lighting: soft ambient + softened key light + gentle fill light
+    scene.add(new THREE.AmbientLight(0xedf1ff, 1.5));
+    const sun = new THREE.DirectionalLight(0xffffff, 1.8);
+    sun.position.set(-4, 8, 5);
+    scene.add(sun);
+    const fillLight = new THREE.DirectionalLight(0xdbe4ff, 0.6);
+    fillLight.position.set(5, -2, -2);
+    scene.add(fillLight);
 
     const world = new THREE.Group(); world.rotation.y = -0.5; scene.add(world);
 
-    // Floating socket plate (no floor, so the widget sits freely on the page)
-    const lav = new THREE.MeshStandardMaterial({ color: 0xd3cdee, roughness: 0.3, metalness: 0.1 });
-    const glass = new THREE.MeshStandardMaterial({ color: 0xbfe6fb, roughness: 0.1, metalness: 0.2, transparent: true, opacity: 0.9 });
-    const wellMat = new THREE.MeshStandardMaterial({ color: 0x4f7fc0, roughness: 0.4 });
+    // Floating socket plate (harmonized with PoisonGuard soft blue/lavender theme)
+    const wellTex = socketTexture();
+    const lav = new THREE.MeshStandardMaterial({
+      color: 0xdde4f7,
+      roughness: 0.45,
+      metalness: 0.05,
+      transparent: true,
+      opacity: 0.72,
+    });
+    const glassRim = new THREE.MeshStandardMaterial({
+      color: 0xc4d4f6,
+      roughness: 0.36,
+      metalness: 0.06,
+      transparent: true,
+      opacity: 0.65,
+    });
+    const wellRim = new THREE.MeshStandardMaterial({
+      color: 0xa6b8f2,
+      roughness: 0.34,
+      metalness: 0.08,
+      transparent: true,
+      opacity: 0.72,
+    });
+    const wellMat = new THREE.MeshStandardMaterial({
+      map: wellTex,
+      roughness: 0.45,
+      metalness: 0.06,
+      transparent: true,
+      opacity: 0.85,
+    });
+
     const disc = new THREE.Mesh(new THREE.CircleGeometry(2.1, 64), lav);
     const well = new THREE.Mesh(new THREE.CircleGeometry(1.35, 64), wellMat);
-    const ring1 = new THREE.Mesh(new THREE.TorusGeometry(2.1, 0.09, 16, 64), glass);
-    const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.45, 0.12, 16, 64), glass);
+    const ring1 = new THREE.Mesh(new THREE.TorusGeometry(2.1, 0.085, 16, 64), glassRim);
+    const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.45, 0.11, 16, 64), wellRim);
     [disc, well, ring1, ring2].forEach((m) => { m.rotation.x = -Math.PI / 2; world.add(m); });
-    disc.position.y = 0.02; well.position.y = 0.03; ring1.position.y = 0.06; ring2.position.y = 0.1;
+    disc.position.y = 0.02; well.position.y = 0.03; ring1.position.y = 0.055; ring2.position.y = 0.09;
 
     const shadow = new THREE.Mesh(
       new THREE.PlaneGeometry(2.6, 2.6),
@@ -167,6 +220,7 @@ export function OrbScene({ speed = 1, className }: Props) {
     return () => {
       cancelAnimationFrame(raf); ro.disconnect(); io.disconnect();
       window.removeEventListener("pointermove", onMove);
+      wellTex.dispose();
       renderer.dispose(); cubeRT.dispose(); pmrem.dispose();
       if (host.contains(renderer.domElement)) {
         host.removeChild(renderer.domElement);
