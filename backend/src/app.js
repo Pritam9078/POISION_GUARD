@@ -35,12 +35,12 @@ export async function buildApp(opts = {}) {
   let rateLimitRedis = null
   if (env.REDIS_URL && !isTest) {
     try {
-      rateLimitRedis = new IORedis(env.REDIS_URL, { connectTimeout: 3000, maxRetriesPerRequest: 1, enableOfflineQueue: false })
-      rateLimitRedis.on('error', (err) => {
-        app.log.warn({ err: err.message }, 'Redis rate-limit client warning; fallback to in-memory store')
-      })
+      const client = new IORedis(env.REDIS_URL, { connectTimeout: 1000, maxRetriesPerRequest: 0, retryStrategy: () => null, enableOfflineQueue: false, lazyConnect: true })
+      client.on('error', () => {})
+      await client.connect()
+      rateLimitRedis = client
     } catch (err) {
-      app.log.warn({ err: err.message }, 'Failed to initialize Redis for rate-limiting')
+      app.log.info({ err: err.message }, 'Redis unavailable for rate-limiting; using in-memory store')
     }
   }
 

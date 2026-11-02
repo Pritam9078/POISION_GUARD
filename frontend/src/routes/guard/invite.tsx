@@ -4,6 +4,7 @@ import { Users, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Logo } from "@/components/pg/kit";
+import { useDemoAuth } from "@/lib/demo-auth";
 
 export const Route = createFileRoute("/guard/invite")({
   component: InviteAcceptancePage,
@@ -11,6 +12,7 @@ export const Route = createFileRoute("/guard/invite")({
 
 function InviteAcceptancePage() {
   const [accepted, setAccepted] = useState(false);
+  const { session } = useDemoAuth();
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-background px-4">
@@ -22,7 +24,11 @@ function InviteAcceptancePage() {
         </div>
         <h1 className="mt-4 font-display text-2xl font-medium tracking-tight">Workspace Invitation</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          You have been invited to join <span className="font-semibold text-foreground">Nordguard Labs</span> as an Approver.
+          You have been invited to join{" "}
+          <span className="font-semibold text-foreground">
+            {session?.workspace || "your team workspace"}
+          </span>{" "}
+          as an Approver.
         </p>
 
         {accepted ? (

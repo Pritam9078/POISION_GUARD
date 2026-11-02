@@ -1,3 +1,22 @@
+import dns from 'node:dns'
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1'])
+  const origLookup = dns.lookup
+  dns.lookup = (hostname, options, callback) => {
+    if (typeof options === 'function') {
+      callback = options
+      options = {}
+    }
+    dns.resolve4(hostname, (err, addrs) => {
+      if (!err && addrs?.length) {
+        if (options?.all) return callback(null, addrs.map((a) => ({ address: a, family: 4 })))
+        return callback(null, addrs[0], 4)
+      }
+      origLookup(hostname, options, callback)
+    })
+  }
+} catch {}
+
 import { buildApp } from './app.js'
 import { env } from './config/env.js'
 import { runMigrations } from './db/migrate.js'

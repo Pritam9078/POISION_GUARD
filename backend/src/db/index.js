@@ -1,3 +1,22 @@
+import dns from 'node:dns'
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1'])
+  const origLookup = dns.lookup
+  dns.lookup = (hostname, options, callback) => {
+    if (typeof options === 'function') {
+      callback = options
+      options = {}
+    }
+    dns.resolve4(hostname, (err, addrs) => {
+      if (!err && addrs?.length) {
+        if (options?.all) return callback(null, addrs.map((a) => ({ address: a, family: 4 })))
+        return callback(null, addrs[0], 4)
+      }
+      origLookup(hostname, options, callback)
+    })
+  }
+} catch {}
+
 import pg from 'pg'
 import { env } from '../config/env.js'
 
@@ -9,6 +28,15 @@ export const pool = new pg.Pool({
   max: 15,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000,
+  lookup: (hostname, options, callback) => {
+    dns.resolve4(hostname, (err, addresses) => {
+      if (err || !addresses?.length) {
+        dns.lookup(hostname, options, callback)
+      } else {
+        callback(null, addresses[0], 4)
+      }
+    })
+  },
 })
 
 pool.on('error', (err) => {

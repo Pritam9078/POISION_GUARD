@@ -93,12 +93,13 @@ export default async function adminRoutes(app) {
     if (!s || !pwOk) return fail('bad_credentials')
     if (s.status !== 'active') return fail('access_inactive_or_expired')
     if (s.mfaEnabled && b.otp && !verifyTotp(decrypt(s.mfaSecretEnc), b.otp)) return fail('bad_otp')
+    let staffToken = null
     await tx(async (c) => {
       await c.update('staff_users', { id: s.id }, { failedLogins: 0, lockedUntil: null, lastLoginAt: new Date() })
-      await createStaffSession(c, reply, req, s.id)
+      staffToken = await createStaffSession(c, reply, req, s.id)
       await audit(c, { actor: { type: 'staff', id: s.id, label: `staff:${s.email}` }, action: 'staff.login', metadata: { mfa: false } })
     })
-    reply.ok({ signedIn: true })
+    reply.ok({ signedIn: true, token: staffToken })
   })
   app.post('/logout', async (req, reply) => {
     if (req.ctx.staffSession) await db.q('UPDATE staff_sessions SET revoked_at = now() WHERE id = $1', [req.ctx.staffSession.id])

@@ -10,18 +10,27 @@ import {
 import { isValidAddress, isValidTxHash } from "./validation";
 
 const REMOTE_BACKEND = "https://poisonguard-backend.onrender.com/api/v1";
+const TOKEN_KEY = "pg_auth_token";
+
+export function getAuthToken(): string | null {
+  if (typeof window !== "undefined") {
+    return window.localStorage.getItem(TOKEN_KEY);
+  }
+  return null;
+}
+
+export function setAuthToken(token: string | null) {
+  if (typeof window !== "undefined") {
+    if (token) window.localStorage.setItem(TOKEN_KEY, token);
+    else window.localStorage.removeItem(TOKEN_KEY);
+  }
+}
 
 export function resolveApiBase(): string {
   const envBase = (import.meta as any).env?.VITE_API_BASE || (import.meta as any).env?.VITE_API_URL;
   if (envBase) {
     const trimmed = String(envBase).replace(/\/$/, "");
     return trimmed.endsWith("/api/v1") ? trimmed : `${trimmed}/api/v1`;
-  }
-  if (typeof window !== "undefined") {
-    const host = window.location.hostname;
-    if (host.includes("vercel.app") || host.includes("poisonguard") || (!host.includes("localhost") && !host.includes("127.0.0.1"))) {
-      return REMOTE_BACKEND;
-    }
   }
   return "/api/v1";
 }
@@ -41,11 +50,16 @@ export async function api<T = any>(
   { method = "GET", body }: { method?: string; body?: any } = {},
 ): Promise<T> {
   const base = resolveApiBase();
+  const token = getAuthToken();
   let res: Response;
+  const headers: Record<string, string> = {
+    ...(body ? { "Content-Type": "application/json" } : {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
   const init: RequestInit = {
     method,
     credentials: "include",
-    headers: body ? { "Content-Type": "application/json" } : {},
+    headers,
   };
   if (body) {
     init.body = JSON.stringify(body);

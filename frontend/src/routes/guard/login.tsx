@@ -36,15 +36,17 @@ function GuardLogin() {
     try {
       const res = await api<{
         user: { id: string; name: string; email: string };
-        memberships: Array<{ workspaceId: string; role: string; workspaceName?: string }>;
+        memberships: Array<{ id?: string; workspaceId: string; role: string; workspaceName?: string; name?: string }>;
+        token?: string;
       }>("/auth/login", {
         method: "POST",
         body: { email: cleanEmail, password },
       });
 
       const firstMem = res.memberships?.[0];
-      const wsName = firstMem?.workspaceName || `${res.user.name}'s Workspace`;
-      signIn("guard", res.user.email, res.user.name, res.user.id, firstMem?.workspaceId, wsName, res.memberships);
+      const wsId = firstMem?.workspaceId || (firstMem as any)?.id;
+      const wsName = firstMem?.workspaceName || firstMem?.name || `${res.user.name}'s Workspace`;
+      signIn("guard", res.user.email, res.user.name, res.user.id, wsId, wsName, res.memberships, res.token);
       toast.success(`Signed in as ${res.user.name}`);
       navigate({ to: "/guard/overview" });
     } catch (err: any) {

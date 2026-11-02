@@ -50,12 +50,12 @@ export default async function authRoutes(app) {
       const u = await c.insert('users', { id: newId('usr'), email: b.email, name: b.name, passwordHash: pw })
       const token = await issueToken(c, u.id, 'verify_email', 48)
       const mems = await ensureWorkspaceForUser(u.id, b.name, c)
-      await createUserSession(c, reply, req, u.id)
+      const sessionToken = await createUserSession(c, reply, req, u.id)
       await audit(c, { actor: { type: 'user', id: u.id, label: u.name }, action: 'user.register', target: { type: 'user', id: u.id } })
-      return { u, token, mems }
+      return { u, token, mems, sessionToken }
     })
     await svc('email').send({ to: b.email, subject: 'Verify your PoisonGuard email', text: `Verify: ${env.FRONTEND_URL}/guard/verify-email?token=${out.token}` })
-    return reply.ok({ user: userDto(out.u), memberships: out.mems }, {}, 201)
+    return reply.ok({ user: userDto(out.u), memberships: out.mems, token: out.sessionToken }, {}, 201)
   })
 
   app.post('/login', strict, async (req, reply) => {
@@ -122,13 +122,14 @@ export default async function authRoutes(app) {
       }
       throw unauthorized('Invalid email or password')
     }
+    let sessionToken = null
     await tx(async (c) => {
       await c.update('users', { id: u.id }, { failedLogins: 0, lockedUntil: null, lastLoginAt: new Date() })
-      await createUserSession(c, reply, req, u.id)
+      sessionToken = await createUserSession(c, reply, req, u.id)
       await audit(c, { actor: { type: 'user', id: u.id, label: u.name }, action: 'user.login', metadata: { method: 'password' } })
     })
     const mems = await ensureWorkspaceForUser(u.id, u.name)
-    return reply.ok({ user: userDto(u), memberships: mems })
+    return reply.ok({ user: userDto(u), memberships: mems, token: sessionToken })
   })
 
   app.post('/logout', async (req, reply) => {

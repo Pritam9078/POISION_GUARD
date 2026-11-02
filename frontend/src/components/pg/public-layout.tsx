@@ -108,9 +108,9 @@ export function PublicLayout({ children, bare = false }: { children: ReactNode; 
       <HelpWidget />
 
       <footer className="relative z-10 border-t bg-card/60 backdrop-blur">
-        <div className="mx-auto max-w-6xl px-4 py-10 pb-28 sm:px-6 sm:pb-12">
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-            <div className="col-span-2 md:col-span-1">
+        <div className="mx-auto max-w-6xl px-5 py-10 pb-32 sm:px-6 sm:pb-12">
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
+            <div className="col-span-1 sm:col-span-2 md:col-span-1">
               <Logo />
               <p className="mt-3 max-w-xs text-xs text-muted-foreground">
                 Analyze, explain, authorize, and verify — never blindly execute.

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ShieldAlert,
@@ -18,7 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { SCANS, scanById, type Scan, type Finding } from "@/lib/fixtures";
 import { SeverityBadge, AddressDisplay, DemoDataNote } from "@/components/pg/kit";
-import { submitFeedback } from "@/lib/api";
+import { api, submitFeedback } from "@/lib/api";
 
 export const Route = createFileRoute("/scan/$scanId")({
   component: ScanResultPage,
@@ -43,8 +43,26 @@ export function ScanResultPage() {
   const [fbMsg, setFbMsg] = useState("");
   const [fbBusy, setFbBusy] = useState(false);
   const [shareMsg, setShareMsg] = useState("");
+  const [loadedScan, setLoadedScan] = useState<Scan | null>(null);
 
-  const scan: Scan = scanById(scanId) ?? SCANS[0]!;
+  useEffect(() => {
+    let unmounted = false;
+    api<any>(`/scans/${encodeURIComponent(scanId)}`)
+      .then((res) => {
+        if (!unmounted && res) {
+          setLoadedScan(res);
+        }
+      })
+      .catch(() => {
+        const f = scanById(scanId);
+        if (!unmounted && f) setLoadedScan(f);
+      });
+    return () => {
+      unmounted = true;
+    };
+  }, [scanId]);
+
+  const scan: Scan = loadedScan || scanById(scanId) || SCANS[0]!;
 
   const findings = scan.findings || [];
   const poisoningFindings = findings.filter(
@@ -229,13 +247,13 @@ export function ScanResultPage() {
             <div className="space-y-4">
               <h3 className="font-display text-lg font-medium">Cryptographic & Forensic Evidence</h3>
               {findings.flatMap((f) =>
-                f.evidence.map((ev, idx) => (
+                (f.evidence || []).map((ev, idx) => (
                   <div key={`${f.id}-${idx}`} className="rounded-2xl border bg-card p-4">
-                    <div className="flex items-center justify-between text-xs">
+                    <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between text-xs">
                       <span className="font-medium text-foreground">{ev.label}</span>
                       <span className="text-muted-foreground">Source: {ev.source}</span>
                     </div>
-                    <pre className="mt-2 font-mono text-xs text-muted-foreground">{ev.value}</pre>
+                    <pre className="mt-2 font-mono text-xs text-muted-foreground break-all whitespace-pre-wrap">{ev.value}</pre>
                   </div>
                 )),
               )}

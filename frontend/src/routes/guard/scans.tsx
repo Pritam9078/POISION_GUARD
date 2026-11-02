@@ -1,27 +1,47 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { FileSearch, Plus, ShieldAlert, ArrowRight } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { DataTable, type Column } from "@/components/pg/data-table";
-import { PageHeader, SeverityBadge, StatusBadge, NetworkBadge, DemoDataNote } from "@/components/pg/kit";
-import { SCANS, NETWORKS, ADDR_SUBJECT, ADDR_LOOKALIKE, type Scan } from "@/lib/fixtures";
+import { PageHeader, SeverityBadge, StatusBadge, NetworkBadge } from "@/components/pg/kit";
 import { validateScanInput } from "@/lib/validation";
+import { useDemoAuth } from "@/lib/demo-auth";
+import { api } from "@/lib/api";
 
 export const Route = createFileRoute("/guard/scans")({
   component: ScansManagementPage,
 });
 
-const cols: Column<Scan>[] = [
+interface ScanRow {
+  id: string;
+  subject: string;
+  network?: string;
+  chainId?: number;
+  status: string;
+  riskLabel?: string;
+  completedAt?: string;
+  requestedAt?: string;
+}
+
+const cols: Column<ScanRow>[] = [
   {
     key: "id",
     header: "Scan ID",
@@ -31,8 +51,8 @@ const cols: Column<Scan>[] = [
       </Link>
     ),
   },
-  { key: "subject", header: "Subject Address / Tx", cell: (r) => <span className="font-mono text-xs">{r.subject}</span> },
-  { key: "network", header: "Network", cell: (r) => <NetworkBadge network={r.network} /> },
+  { key: "subject", header: "Subject Address / Tx", cell: (r) => <span className="font-mono text-xs break-all">{r.subject}</span> },
+  { key: "network", header: "Network", cell: (r) => <NetworkBadge network={r.network || "ethereum"} /> },
   { key: "status", header: "Status", cell: (r) => <StatusBadge status={r.status} /> },
   {
     key: "risk",
@@ -40,24 +60,57 @@ const cols: Column<Scan>[] = [
     cell: (r) => (
       <SeverityBadge
         severity={
-          r.riskLabel === "elevated" ? "medium" : r.riskLabel === "inconclusive" ? "info" : r.riskLabel
+          r.riskLabel === "elevated"
+            ? "medium"
+            : r.riskLabel === "inconclusive"
+              ? "info"
+              : ((r.riskLabel as any) || "low")
         }
       />
     ),
   },
-  { key: "completedAt", header: "Timestamp", cell: (r) => <span className="text-xs text-muted-foreground">{r.completedAt}</span> },
+  {
+    key: "completedAt",
+    header: "Timestamp",
+    cell: (r) => <span className="text-xs text-muted-foreground">{r.completedAt || r.requestedAt ? new Date(r.completedAt || r.requestedAt!).toLocaleString() : "Just now"}</span>,
+  },
 ];
 
 function ScansManagementPage() {
+  const { session } = useDemoAuth();
+  const [scans, setScans] = useState<ScanRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // New scan dialog
   const [open, setOpen] = useState(false);
-  const [inputVal, setInputVal] = useState(ADDR_SUBJECT);
-  const [network, setNetwork] = useState("ethereum");
-  const [contextTx, setContextTx] = useState("");
+  const [inputVal, setInputVal] = useState("");
+  const [chainId, setChainId] = useState("1");
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleStartScan = (e: FormEvent) => {
+  const wsId = session?.workspaceId || session?.memberships?.[0]?.workspaceId;
+
+  const fetchScans = async () => {
+    if (!wsId) {
+      setLoading(false);
+      return;
+    }
+    try {
+      const res = await api<{ items: ScanRow[] }>(`/workspaces/${encodeURIComponent(wsId)}/scans`);
+      setScans(res.items || []);
+    } catch {
+      setScans([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void fetchScans();
+  }, [wsId]);
+
+  const handleStartScan = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -68,13 +121,39 @@ function ScansManagementPage() {
     }
 
     setScanning(true);
-    setTimeout(() => {
-      setScanning(false);
+    try {
+      let scanResultId = "";
+      if (wsId) {
+        try {
+          const res = await api<{ scanId: string }>(`/workspaces/${encodeURIComponent(wsId)}/scans`, {
+            method: "POST",
+            body: { chainId: Number(chainId), input: inputVal.trim() },
+          });
+          scanResultId = res.scanId;
+        } catch {
+          // Fall back to public scan endpoint
+          const res = await api<{ scanId: string }>("/scans", {
+            method: "POST",
+            body: { chainId: Number(chainId), input: inputVal.trim() },
+          });
+          scanResultId = res.scanId;
+        }
+      } else {
+        const res = await api<{ scanId: string }>("/scans", {
+          method: "POST",
+          body: { chainId: Number(chainId), input: inputVal.trim() },
+        });
+        scanResultId = res.scanId;
+      }
+
       setOpen(false);
-      // Navigate to the scan results page inside the app
-      const match = SCANS.find((s) => s.subject.toLowerCase() === inputVal.trim().toLowerCase()) ?? SCANS[0]!;
-      navigate({ to: "/scan/$scanId", params: { scanId: match.id } });
-    }, 600);
+      toast.success("Scan initiated!");
+      navigate({ to: "/scan/$scanId", params: { scanId: scanResultId } });
+    } catch (err: any) {
+      setError(err.message || "Failed to initiate scan.");
+    } finally {
+      setScanning(false);
+    }
   };
 
   return (
@@ -83,106 +162,80 @@ function ScansManagementPage() {
         title="Scan History & Analysis"
         description="Forensic evaluations of addresses, contracts, and transactions run by your organization."
         actions={
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button className="rounded-full">
-                <Plus className="mr-1.5 size-4" /> Run New Scan
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md rounded-3xl">
-              <DialogHeader>
-                <DialogTitle className="font-display text-xl font-medium">Run Forensic Scan</DialogTitle>
-                <DialogDescription className="text-xs text-muted-foreground">
-                  Analyze an EVM address or transaction hash for poisoning patterns, lookalike disparity, and unlimited allowances.
-                </DialogDescription>
-              </DialogHeader>
-
-              <form onSubmit={handleStartScan} className="space-y-4 pt-2">
-                <div>
-                  <Label htmlFor="scan-network" className="text-xs uppercase tracking-wider text-muted-foreground">
-                    EVM Network
-                  </Label>
-                  <select
-                    id="scan-network"
-                    value={network}
-                    onChange={(e) => setNetwork(e.target.value)}
-                    className="mt-1.5 flex h-10 w-full rounded-full border bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  >
-                    {NETWORKS.map((n) => (
-                      <option key={n.key} value={n.key}>
-                        {n.name} (Chain {n.chainId})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <Label htmlFor="scan-subject" className="text-xs uppercase tracking-wider text-muted-foreground">
-                    Address or Transaction Hash
-                  </Label>
-                  <Input
-                    id="scan-subject"
-                    value={inputVal}
-                    onChange={(e) => setInputVal(e.target.value)}
-                    placeholder="0x…"
-                    className="mt-1.5 font-mono text-sm rounded-full"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="scan-context" className="text-xs uppercase tracking-wider text-muted-foreground">
-                    Context Transaction Hash (Optional)
-                  </Label>
-                  <Input
-                    id="scan-context"
-                    value={contextTx}
-                    onChange={(e) => setContextTx(e.target.value)}
-                    placeholder="0x… (recent interaction)"
-                    className="mt-1.5 font-mono text-sm rounded-full"
-                  />
-                </div>
-
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span>Samples:</span>
-                  <button
-                    type="button"
-                    onClick={() => setInputVal(ADDR_SUBJECT)}
-                    className="rounded-full bg-secondary px-2.5 py-0.5 text-foreground hover:bg-secondary/80"
-                  >
-                    Victim Wallet
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setInputVal(ADDR_LOOKALIKE)}
-                    className="rounded-full bg-secondary px-2.5 py-0.5 text-foreground hover:bg-secondary/80"
-                  >
-                    Lookalike Attacker
-                  </button>
-                </div>
-
-                {error && <p className="rounded-xl bg-destructive/10 p-3 text-xs text-destructive">{error}</p>}
-
-                <div className="flex justify-end gap-2 pt-2">
-                  <Button type="button" variant="outline" onClick={() => setOpen(false)} className="rounded-full">
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={scanning} className="rounded-full px-6">
-                    {scanning ? "Analyzing…" : "Execute Scan"}
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
+          <Button onClick={() => setOpen(true)} className="rounded-full">
+            <Plus className="mr-1.5 size-4" /> Run New Scan
+          </Button>
         }
       />
 
       <div className="rounded-3xl border bg-card p-6 shadow-sm">
-        <DataTable columns={cols} rows={SCANS} rowKey={(r) => r.id} />
+        {loading ? (
+          <div className="py-8 text-center text-sm text-muted-foreground">Loading workspace scans…</div>
+        ) : scans.length === 0 ? (
+          <div className="py-12 text-center">
+            <FileSearch className="mx-auto size-8 text-muted-foreground/60" />
+            <h4 className="mt-3 text-sm font-medium text-foreground">No scans run yet</h4>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Run a forensic evaluation on any EVM wallet or transaction hash to detect lookalike address poisoning and unlimited allowances.
+            </p>
+            <Button onClick={() => setOpen(true)} variant="outline" size="sm" className="mt-4 rounded-full">
+              <Plus className="mr-1.5 size-3.5" /> Start First Scan
+            </Button>
+          </div>
+        ) : (
+          <DataTable columns={cols} rows={scans} rowKey={(r) => r.id} />
+        )}
       </div>
 
-      <DemoDataNote />
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Launch Security Scan</DialogTitle>
+            <DialogDescription>
+              Submit an EVM address or transaction hash to verify counterparty authenticity.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleStartScan} className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="scan-target">Address or Transaction Hash</Label>
+              <Input
+                id="scan-target"
+                placeholder="0x... (40-char address or 64-char tx hash)"
+                value={inputVal}
+                onChange={(e) => setInputVal(e.target.value)}
+                className="font-mono text-xs"
+                required
+              />
+              {error && <p className="text-xs text-destructive">{error}</p>}
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="scan-net">Network</Label>
+              <Select value={chainId} onValueChange={setChainId}>
+                <SelectTrigger id="scan-net">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Ethereum</SelectItem>
+                  <SelectItem value="8453">Base</SelectItem>
+                  <SelectItem value="42161">Arbitrum One</SelectItem>
+                  <SelectItem value="10">OP Mainnet</SelectItem>
+                  <SelectItem value="137">Polygon</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <DialogFooter className="mt-4">
+              <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={scanning} className="rounded-full">
+                {scanning ? "Analyzing…" : "Start Scan"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
-

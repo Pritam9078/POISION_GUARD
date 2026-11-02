@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
-import { api } from "./api";
+import { api, setAuthToken } from "./api";
 
 export type DemoRole = "guard" | "admin";
 
@@ -8,6 +8,7 @@ export interface WorkspaceMembership {
   workspaceId: string;
   role: string;
   workspaceName?: string;
+  name?: string;
   slug?: string;
   workspace?: {
     id: string;
@@ -40,6 +41,7 @@ interface DemoAuthValue {
     workspaceId?: string,
     workspaceName?: string,
     memberships?: WorkspaceMembership[],
+    token?: string,
   ) => void;
   switchWorkspace: (workspaceId: string, workspaceName: string) => void;
   signOut: () => void;
@@ -68,9 +70,10 @@ export function DemoAuthProvider({ children }: { children: ReactNode }) {
       if (res?.user) {
         const mems = res.memberships || [];
         const savedWsId = typeof window !== "undefined" ? window.localStorage.getItem(ACTIVE_WS_KEY) : null;
-        const activeMem = mems.find((m) => m.workspaceId === savedWsId) || mems[0];
+        const activeMem = mems.find((m) => m.workspaceId === savedWsId || (m as any).id === savedWsId) || mems[0];
         const wsName =
           activeMem?.workspaceName ||
+          activeMem?.name ||
           activeMem?.workspace?.name ||
           (res.user.name ? `${res.user.name}'s Workspace` : "My Workspace");
         const next: DemoSession = {
@@ -78,7 +81,7 @@ export function DemoAuthProvider({ children }: { children: ReactNode }) {
           id: res.user.id,
           email: res.user.email,
           name: res.user.name,
-          workspaceId: activeMem?.workspaceId || activeMem?.workspace?.id,
+          workspaceId: activeMem?.workspaceId || (activeMem as any)?.id || activeMem?.workspace?.id,
           workspace: wsName,
           memberships: mems,
         };
@@ -118,7 +121,9 @@ export function DemoAuthProvider({ children }: { children: ReactNode }) {
       workspaceId?: string,
       workspaceName?: string,
       memberships?: WorkspaceMembership[],
+      token?: string,
     ) => {
+      if (token) setAuthToken(token);
       const defaultWsName = role === "admin" ? "Platform Staff" : `${name.trim()}'s Workspace`;
       const chosenWsName = workspaceName || defaultWsName;
       const next: DemoSession = {
@@ -154,6 +159,7 @@ export function DemoAuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(() => {
     setSession(null);
+    setAuthToken(null);
     window.localStorage.removeItem(STORAGE_KEY);
     window.localStorage.removeItem(ACTIVE_WS_KEY);
     void api("/auth/logout", { method: "POST" }).catch(() => {});

@@ -17,7 +17,7 @@ export const allowedOrigins = () => {
   return [env.FRONTEND_URL, env.ADMIN_URL, 'https://poisionguardadmin.vercel.app', 'https://poisonguard-steel.vercel.app'].map((s) => s.replace(/\/+$/, ''))
 }
 
-export const cookieOpts = (maxAgeSec) => ({ path: '/', httpOnly: true, sameSite: 'lax', secure: env.COOKIE_SECURE, maxAge: maxAgeSec })
+export const cookieOpts = (maxAgeSec) => ({ path: '/', httpOnly: true, sameSite: env.COOKIE_SECURE ? 'none' : 'lax', secure: env.COOKIE_SECURE, maxAge: maxAgeSec })
 
 async function core(app) {
   app.decorateRequest('ctx', null)
@@ -37,7 +37,10 @@ async function core(app) {
       }
     }
 
-    const ut = req.cookies?.[USER_COOKIE]
+    let ut = req.cookies?.[USER_COOKIE]
+    if (!ut && req.headers.authorization?.startsWith('Bearer ')) {
+      ut = req.headers.authorization.slice(7).trim()
+    }
     if (ut) {
       const s = await db.one(`SELECT s.*, u.email, u.name, u.status AS user_status, u.email_verified_at FROM sessions s JOIN users u ON u.id = s.user_id
         WHERE s.token_hash = $1 AND s.revoked_at IS NULL AND s.expires_at > now()`, [hashToken(ut)])
@@ -47,7 +50,10 @@ async function core(app) {
         if (Date.now() - new Date(s.lastSeenAt).getTime() > 5 * 60_000) db.q('UPDATE sessions SET last_seen_at = now() WHERE id = $1', [s.id]).catch(() => {})
       }
     }
-    const st = req.cookies?.[STAFF_COOKIE]
+    let st = req.cookies?.[STAFF_COOKIE]
+    if (!st && req.headers['x-staff-token']) {
+      st = String(req.headers['x-staff-token']).trim()
+    }
     if (st && req.url.startsWith('/api/v1/admin')) {
       const s = await db.one(`SELECT ss.id AS session_id, su.*, r.capabilities FROM staff_sessions ss JOIN staff_users su ON su.id = ss.staff_id
         JOIN platform_staff_roles r ON r.key = su.role_key

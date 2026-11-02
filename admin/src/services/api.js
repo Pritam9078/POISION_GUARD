@@ -2,7 +2,12 @@ const BASE = import.meta.env.VITE_API_BASE || '/api/v1'
 export class ApiError extends Error { constructor(code, message, status) { super(message); this.code = code; this.status = status } }
 export async function api(path, { method = 'GET', body } = {}) {
   let res
-  try { res = await fetch(BASE + path, { method, credentials: 'include', headers: body ? { 'Content-Type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined }) }
+  const token = typeof window !== 'undefined' ? window.localStorage.getItem('pg_staff_token') : null
+  const headers = {
+    ...(body ? { 'Content-Type': 'application/json' } : {}),
+    ...(token ? { 'x-staff-token': token } : {}),
+  }
+  try { res = await fetch(BASE + path, { method, credentials: 'include', headers, body: body ? JSON.stringify(body) : undefined }) }
   catch { throw new ApiError('NETWORK', 'Cannot reach the PoisonGuard API.', 0) }
   let json = null
   try { json = await res.json() } catch { /* non-JSON */ }
