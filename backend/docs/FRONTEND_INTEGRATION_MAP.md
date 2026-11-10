@@ -1,6 +1,6 @@
 # Frontend integration map
 
-Source inspected: `frontend/` (TanStack Start + **React/TypeScript**, Lovable-generated). Every page currently renders `src/lib/fixtures.ts`; only three calls hit the API (`/recipients/check`, `/approvals`, `/feedback`) and **each silently falls back to fixture data on failure**. That fallback must be removed when wiring — it shows fake results whenever the backend is down.
+Source inspected: `frontend/` (TanStack Start + **React/TypeScript**). Every page currently renders `src/lib/fixtures.ts`; only three calls hit the API (`/recipients/check`, `/approvals`, `/feedback`) and **each silently falls back to fixture data on failure**. That fallback must be removed when wiring — it shows fake results whenever the backend is down.
 
 > ⚠️ Stack conflict: the PRD requires Vue 3 + JavaScript with no React/TS. The frontend as delivered violates that. This backend is framework-agnostic REST, so either a Vue rewrite or the current React app can consume it unchanged.
 

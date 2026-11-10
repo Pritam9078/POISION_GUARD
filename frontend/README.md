@@ -36,16 +36,6 @@ The PoisonGuard PRD says the default theme is dark. This style is light, so ther
 How to use this reference
 Take the style: the gradient, the rounded cards, the type scale and the pill buttons. Use your own logo, copy and exact gradient values. Do not copy the original designer's branding.
 
-This project was built with [Lovable](https://lovable.dev).
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/bd08d8e9-3697-45f2-aaba-c443c1f46a0d).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
 ## Development
 
 Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
