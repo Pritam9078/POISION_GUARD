@@ -15,7 +15,7 @@
     "db:seed": "node scripts/seed.js",
     "staff:create": "node scripts/create-staff.js",
     "test": "node --test --test-concurrency=1 \"tests/**/*.test.js\"",
-    "test:unit": "node --test \"tests/unit/*.test.js\"",
+    "test:unit": "node tests/helpers/run-unit-tests.js",
     "test:e2e": "playwright test --config=tests/playwright.config.js",
     "test:api": "node tests/helpers/run-api-tests.js",
     "test:integration": "node tests/helpers/run-integration-tests.js",
