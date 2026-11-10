@@ -8,7 +8,7 @@ import swaggerUi from '@fastify/swagger-ui'
 import IORedis from 'ioredis'
 import { randomUUID } from 'node:crypto'
 import { env, isTest } from './config/env.js'
-import core, { allowedOrigins } from './plugins/core.js'
+import core, { allowedOrigins, isOriginAllowed } from './plugins/core.js'
 import { wireServices } from './services/wire.js'
 import { AppError } from './shared/errors.js'
 
@@ -29,7 +29,13 @@ export async function buildApp(opts = {}) {
   })
 
   await app.register(helmet, { contentSecurityPolicy: false, crossOriginResourcePolicy: { policy: 'same-site' } })
-  await app.register(cors, { origin: (o, cb) => cb(null, !o || allowedOrigins().includes(o)), credentials: true, methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'] })
+  await app.register(cors, {
+    origin: (o, cb) => cb(null, isOriginAllowed(o)),
+    credentials: true,
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'x-request-id', 'x-staff-token', 'x-api-key'],
+    exposedHeaders: ['x-request-id']
+  })
   await app.register(cookie, { secret: env.SESSION_SECRET })
 
   let rateLimitRedis = null

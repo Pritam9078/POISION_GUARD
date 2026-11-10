@@ -14,7 +14,41 @@ export const allowedOrigins = () => {
     if (env.CORS_ORIGINS === '*') return ['*']
     return env.CORS_ORIGINS.split(',').map((s) => s.trim().replace(/\/+$/, ''))
   }
-  return [env.FRONTEND_URL, env.ADMIN_URL, 'https://poisionguardadmin.vercel.app', 'https://poisonguard-steel.vercel.app'].map((s) => s.replace(/\/+$/, ''))
+  return [
+    env.FRONTEND_URL,
+    env.ADMIN_URL,
+    'https://poisionguardadmin.vercel.app',
+    'https://poisonguard-steel.vercel.app',
+    'https://poisonguard-three.vercel.app',
+  ].filter(Boolean).map((s) => s.replace(/\/+$/, ''))
+}
+
+export const isOriginAllowed = (origin) => {
+  if (!origin) return true
+  const clean = origin.trim().replace(/\/+$/, '')
+  const explicit = allowedOrigins()
+  if (explicit.includes('*') || explicit.includes(clean)) return true
+
+  try {
+    const url = new URL(clean)
+    const host = url.hostname.toLowerCase()
+
+    // Localhost / 127.0.0.1 on any port
+    if (host === 'localhost' || host === '127.0.0.1') return true
+
+    // Any PoisonGuard deployment on Vercel (e.g. poisonguard-three.vercel.app, poisionguardadmin.vercel.app)
+    if (/^(poisonguard|poisionguard)[a-z0-9-]*\.vercel\.app$/i.test(host)) return true
+
+    // Custom domain production deployments if configured
+    if (host === 'poisonguard.io' || host.endsWith('.poisonguard.io') ||
+        host === 'poisonguard.xyz' || host.endsWith('.poisonguard.xyz')) {
+      return true
+    }
+  } catch {
+    return false
+  }
+
+  return false
 }
 
 export const cookieOpts = (maxAgeSec) => ({ path: '/', httpOnly: true, sameSite: env.COOKIE_SECURE ? 'none' : 'lax', secure: env.COOKIE_SECURE, maxAge: maxAgeSec })
@@ -31,8 +65,7 @@ async function core(app) {
     // CSRF defence for cookie auth: browsers always send Origin on cross-site state-changing requests.
     if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
       const origin = req.headers.origin?.replace(/\/+$/, '')
-      const allowed = allowedOrigins()
-      if (origin && !allowed.includes('*') && !allowed.includes(origin) && !req.url.startsWith('/api/v1/webhooks/') && !req.url.startsWith('/api/v1/agent/')) {
+      if (origin && !isOriginAllowed(origin) && !req.url.startsWith('/api/v1/webhooks/') && !req.url.startsWith('/api/v1/agent/')) {
         throw new AppError(403, 'ORIGIN_REJECTED', 'Request origin is not allowed')
       }
     }
