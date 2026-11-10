@@ -1,48 +1,52 @@
-# Soft Gradient Fintech
+# 🛡️ PoisonGuard Frontend
 
-only i need the compl;ete forn tend of this project end to end to end for user and admin 
-Soft-Gradient Fintech Landing Page
-Source: a Dribbble shot titled "Fintech Trading Platform Landing Page UI" (mock brand "Liquid Brokers"). Colour values below are estimated by eye from a screenshot, not read from design files.
-Summary
-A light, airy fintech landing page in the "soft gradient + minimal" style. Calm, premium and trustworthy, with colour coming only from a soft gradient and everything else kept black, white or grey.
-UI types you can name
+The official web client for [PoisonGuard](https://github.com/Pritam9078/POISION_GUARD). Built with **TanStack Start**, **React 19**, **Tailwind CSS**, and **Vite 8**.
 
-* Aurora / mesh gradient background. A soft blur of colour that moves from pale blue to violet, with no hard edges.
-* Floating rounded container. One big white card with very large corner radii sits on a tinted backdrop.
-* Bento / widget cards. Small rounded white cards ("Instant Trade Execution", "55+ currencies") overlap the gradient, with a frosted or glassy feel.
-* Oversized editorial typography. A huge, light-weight headline with tight letter-spacing carries the page, and the supporting copy is small.
-* Pill-shaped controls. The buttons and nav chips are fully rounded.
-* Minimal navigation. A plain text logo, a few links with dropdown arrows, and a ghost "Login" next to a "Sign up" pill.
-* Social proof and app-store badges. An avatar stack ("Used by 62,000+ people") and Google Play / App Store buttons sit in the lower left.
+---
 
-Colour combination (estimated)
+## ⚡ Features
 
-* Base: white to off-white, roughly `#FFFFFF` to `#F7F8FC`.
-* Gradient: pale sky blue (about `#CFE0FB`), then periwinkle blue (about `#8DA6F4`), then soft violet or lavender (about `#A99AF6`), with a faint pink-lilac at the edges.
-* Contrast colour: near-black (about `#0F1115`) for the main CTA pill, the headline and the icons.
-* Neutral: light grey (about `#F1F2F5`) for the secondary pills and chips.
-* Rule of use: colour comes only from the gradient. Everything else stays black, white or grey.
+- **Interactive Risk Scanner**: Multi-chain real-time address poisoning and dust attack inspector.
+- **Guard Workspace**: Enterprise and team workspace for policy configuration, counterparty management, and transaction approval state machines.
+- **Token Allowance Auditor (`/revoke`)**: Self-custody read-only token allowance inspector and zero-allowance transaction generator.
+- **Autonomous Agent Dashboard**: Guardrail monitors and cryptographic intent verification for AI agents.
 
-Typography
-A clean neo-grotesque sans-serif in the style of Inter Tight, Neue Montreal or Suisse. The headline is light to regular weight at a very large size with tight tracking. Body text and labels are small and regular, with generous white space.
-Brand theme and mood
-Calm, premium and trustworthy, modern and uncluttered, and confident without being loud. It reads as "regulated and professional" but friendly, rather than the dark neon crypto look.
-Decision for PoisonGuard
-The PoisonGuard PRD says the default theme is dark. This style is light, so there are two options:
+---
 
-1. Switch the PoisonGuard default to light and use this palette as the main theme.
-2. Keep this palette as the light mode and add a dark mode later.
+## 🛠️ Tech Stack
 
-How to use this reference
-Take the style: the gradient, the rounded cards, the type scale and the pill buttons. Use your own logo, copy and exact gradient values. Do not copy the original designer's branding.
+- **Framework**: TanStack Start (SSR & Static generation)
+- **UI Library**: React 19
+- **Bundler**: Vite 8
+- **Styling**: Tailwind CSS with custom glassmorphism and aurora themes
+- **Icons**: Lucide React
+- **Web3**: Direct EIP-1193 provider integration (MetaMask, Coinbase Wallet, WalletConnect)
 
-## Development
+---
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+## 🚀 Development Setup
 
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+```bash
+# Install dependencies
+npm install
+
+# Start local development server (port 5173)
 npm run dev
+
+# Run TypeScript typecheck
+npx tsc --noEmit
+
+# Build production bundle
+npm run build
+```
+
+---
+
+## 🌐 Environment Variables
+
+Create a `.env` file in the `frontend` root:
+
+```env
+# Optional: override default backend API base (defaults to /api/v1 with direct Render fallback)
+VITE_API_BASE=https://poisonguard-backend.onrender.com/api/v1
 ```

@@ -34,3 +34,4 @@ test('CORS & CSRF origin policy validation', async (t) => {
     assert.equal(isOriginAllowed('not a valid url'), false)
   })
 })
+

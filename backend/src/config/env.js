@@ -12,7 +12,9 @@ const schema = z.object({
   ADMIN_URL: z.string().default('http://localhost:5174'),
   CORS_ORIGINS: z.string().optional(),
 
-  DATABASE_URL: z.string().min(1),
+  DATABASE_URL: process.env.NODE_ENV === 'test'
+    ? z.string().default('postgresql://postgres:postgres@localhost:5432/poisonguard_test')
+    : z.string().min(1),
   REDIS_URL: z.string().optional(),
   // inline = run jobs in-process (dev/test). queue = BullMQ + separate worker process.
   JOB_MODE: z.enum(['inline', 'queue']).default('inline'),
