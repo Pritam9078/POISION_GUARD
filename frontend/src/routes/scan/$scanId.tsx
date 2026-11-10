@@ -66,9 +66,9 @@ export function ScanResultPage() {
 
   const findings = scan.findings || [];
   const poisoningFindings = findings.filter(
-    (f) => f.category.toLowerCase().includes("poison") || f.category.toLowerCase().includes("dust"),
+    (f) => f.category?.toLowerCase()?.includes("poison") || f.category?.toLowerCase()?.includes("dust"),
   );
-  const approvalFindings = findings.filter((f) => f.category.toLowerCase().includes("approval"));
+  const approvalFindings = findings.filter((f) => f.category?.toLowerCase()?.includes("approval"));
 
   const handleFeedback = async () => {
     if (feedback.trim().length < 10) return;
@@ -267,7 +267,7 @@ export function ScanResultPage() {
                 PoisonGuard explicitly discloses data provider coverage bounds for every scan:
               </p>
               <div className="mt-4 divide-y">
-                {scan.coverage.map((c) => (
+                {(scan.coverage || []).map((c) => (
                   <div key={c.source} className="flex items-center justify-between py-3">
                     <div>
                       <div className="text-sm font-medium">{c.source}</div>

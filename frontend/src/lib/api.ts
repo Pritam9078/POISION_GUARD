@@ -51,6 +51,10 @@ export async function api<T = any>(
 ): Promise<T> {
   const base = resolveApiBase();
   const token = getAuthToken();
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const cleanBase = base.replace(/\/$/, "");
+  const cleanRemote = REMOTE_BACKEND.replace(/\/$/, "");
+
   let res: Response;
   const headers: Record<string, string> = {
     ...(body ? { "Content-Type": "application/json" } : {}),
@@ -66,16 +70,16 @@ export async function api<T = any>(
   }
 
   try {
-    res = await fetch(base + path, init);
+    res = await fetch(`${cleanBase}${normalizedPath}`, init);
     // If local/relative path returned 404, fallback directly to the live Render backend
-    if (!res.ok && res.status === 404 && base !== REMOTE_BACKEND) {
-      res = await fetch(REMOTE_BACKEND + path, init);
+    if (!res.ok && res.status === 404 && cleanBase !== cleanRemote) {
+      res = await fetch(`${cleanRemote}${normalizedPath}`, init);
     }
   } catch {
     // If primary fetch failed with network error, attempt fallback to remote backend
-    if (base !== REMOTE_BACKEND) {
+    if (cleanBase !== cleanRemote) {
       try {
-        res = await fetch(REMOTE_BACKEND + path, init);
+        res = await fetch(`${cleanRemote}${normalizedPath}`, init);
       } catch {
         throw new ApiError("NETWORK", "Cannot reach the PoisonGuard API backend.", 0);
       }

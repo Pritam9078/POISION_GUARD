@@ -7,24 +7,24 @@ export type DemoRole = "guard" | "admin";
 export interface WorkspaceMembership {
   workspaceId: string;
   role: string;
-  workspaceName?: string;
-  name?: string;
-  slug?: string;
+  workspaceName?: string | undefined;
+  name?: string | undefined;
+  slug?: string | undefined;
   workspace?: {
     id: string;
     name: string;
-    slug?: string;
-  };
+    slug?: string | undefined;
+  } | undefined;
 }
 
 export interface DemoSession {
   role: DemoRole;
-  id?: string;
+  id?: string | undefined;
   email: string;
   name: string;
   workspace: string;
-  workspaceId?: string;
-  memberships?: WorkspaceMembership[];
+  workspaceId?: string | undefined;
+  memberships?: WorkspaceMembership[] | undefined;
 }
 
 const STORAGE_KEY = "pg-demo-session";
