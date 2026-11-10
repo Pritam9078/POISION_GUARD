@@ -144,13 +144,13 @@ export async function checkRecipient(payload: {
   }
 }
 
-/** Fetch allowances with backend support or fixture fallback */
+/** Fetch allowances with backend support */
 export async function fetchAllowances(owner: string, chainId: number) {
   try {
-    const data = await api(`/approvals?owner=${encodeURIComponent(owner)}&chainId=${chainId}`);
+    const data = await api<{ items: any[] }>(`/approvals?owner=${encodeURIComponent(owner)}&chainId=${chainId}`);
     return data.items || [];
   } catch {
-    return TOKEN_ALLOWANCES;
+    return [];
   }
 }
 

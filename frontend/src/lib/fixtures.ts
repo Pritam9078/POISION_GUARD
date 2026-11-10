@@ -795,9 +795,9 @@ export const EVALUATION_RUN = {
 /* ------------------------------------------------------------- approvals */
 
 export const TOKEN_ALLOWANCES = [
-  { id: "TA-1", token: "USDC", tokenAddr: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", spender: "0x5f2c44a7b01933881cc6ba3ed0b8f2a91e709b1e", spenderLabel: "Unfamiliar spender", allowance: "Unlimited", grantedAt: "2026-10-24", network: "ethereum" as NetworkKey, risk: "critical" as Severity, note: "Funded from same cluster as dust transfers" },
-  { id: "TA-2", token: "WETH", tokenAddr: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", spender: "0x1111111254eeb25477b68fb85ed92940a95f41c0", spenderLabel: "Known DEX aggregator", allowance: "5.0 WETH", grantedAt: "2026-09-30", network: "ethereum" as NetworkKey, risk: "low" as Severity, note: "Recognized router" },
-  { id: "TA-3", token: "DAI", tokenAddr: "0x6b175474e89094c44da98b954eedeac495271d0f", spender: "0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45", spenderLabel: "Known DEX router", allowance: "1,000 DAI", grantedAt: "2026-10-02", network: "ethereum" as NetworkKey, risk: "low" as Severity, note: "Recognized router" },
+  { id: "TA-1", token: "USDC", tokenAddr: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", spender: "0x000000000022d473030f116ddee9f6b43ac78ba3", spenderLabel: "Uniswap Permit2", allowance: "Unlimited", grantedAt: "2026-10-24", network: "ethereum" as NetworkKey, risk: "medium" as Severity, note: "Official canonical Permit2 protocol contract" },
+  { id: "TA-2", token: "WETH", tokenAddr: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", spender: "0x1111111254eeb25477b68fb85ed92940a95f41c0", spenderLabel: "Known DEX aggregator", allowance: "5.0 WETH", grantedAt: "2026-09-30", network: "ethereum" as NetworkKey, risk: "low" as Severity, note: "Recognized 1inch router" },
+  { id: "TA-3", token: "DAI", tokenAddr: "0x6b175474e89094c44da98b954eedeac495271d0f", spender: "0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45", spenderLabel: "Known DEX router", allowance: "1,000 DAI", grantedAt: "2026-10-02", network: "ethereum" as NetworkKey, risk: "low" as Severity, note: "Recognized Uniswap V3 router" },
 ];
 
 /* --------------------------------------------------------------- proofs */
