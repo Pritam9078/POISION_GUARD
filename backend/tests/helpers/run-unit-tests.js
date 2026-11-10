@@ -33,3 +33,4 @@ stream.compose(new spec()).pipe(process.stdout)
 stream.on('test:fail', () => {
   process.exitCode = 1
 })
+
